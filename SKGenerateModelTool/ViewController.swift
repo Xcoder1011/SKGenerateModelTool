@@ -24,7 +24,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var jsonTypeBtn: NSPopUpButton!
     @IBOutlet weak var generateFileBtn: NSButton!
 
-    var outputFilePath: String?
+    /// cache key
 
     let LastInputURLCacheKey = "LastInputURLCacheKey"
     let SuperClassNameCacheKey = "SuperClassNameCacheKey"
@@ -35,6 +35,11 @@ class ViewController: NSViewController {
     let SupportJSONModelTypeCacheKey = "SupportJSONModelTypeCacheKey"
     let ShouldGenerateFileCacheKey = "ShouldGenerateFileCacheKey"
     let GenerateFilePathCacheKey = "GenerateFilePathCacheKey"
+    
+    /// cache key
+    var outputFilePath: String?
+
+    var builder = SKCodeBuilder()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +62,9 @@ class ViewController: NSViewController {
         loadUserLastInputContent()
     }
     
+    /// load cache
     func loadUserLastInputContent() {
+        
         if let lastUrl = UserDefaults.standard.string(forKey: LastInputURLCacheKey)  {
             urlTF.stringValue = lastUrl
         }
@@ -77,6 +84,19 @@ class ViewController: NSViewController {
             outputFilePath = outFilePath
         }
         
+        builder.config.codeType = SKCodeBuilderCodeType(rawValue: UserDefaults.standard.integer(forKey: BuildCodeTypeCacheKey)) ?? .OC
+        codeTypeBtn.selectItem(at: builder.config.codeType.rawValue - 1)
+        
+        builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: UserDefaults.standard.integer(forKey: SupportJSONModelTypeCacheKey)) ?? .None
+        jsonTypeBtn.selectItem(at: builder.config.jsonType.rawValue)
+                    
+        generateFileBtn.state = UserDefaults.standard.bool(forKey: SupportJSONModelTypeCacheKey) ? .on : .off
+    }
+    
+    /// save cache
+    func saveUserInputContent() {
+        let superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
+        UserDefaults.standard.setValue(superClassName, forKey: SuperClassNameCacheKey)
     }
     
     
