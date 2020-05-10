@@ -11,6 +11,7 @@
 		BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88CEA22467A8A600A4828B /* ViewController.swift */; };
 		BC88CEA52467A8AA00A4828B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88CEA42467A8AA00A4828B /* Assets.xcassets */; };
 		BC88CEA82467A8AA00A4828B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC88CEA62467A8AA00A4828B /* Main.storyboard */; };
+		BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		BC88CEA72467A8AA00A4828B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BC88CEA92467A8AA00A4828B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC88CEAA2467A8AA00A4828B /* SKGenerateModelTool.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SKGenerateModelTool.entitlements; sourceTree = "<group>"; };
+		BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCodeBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			children = (
 				BC88CEA02467A8A600A4828B /* AppDelegate.swift */,
 				BC88CEA22467A8A600A4828B /* ViewController.swift */,
+				BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */,
 				BC88CEA42467A8AA00A4828B /* Assets.xcassets */,
 				BC88CEA62467A8AA00A4828B /* Main.storyboard */,
 				BC88CEA92467A8AA00A4828B /* Info.plist */,
@@ -133,6 +136,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */,
 				BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */,
 				BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */,
 			);
