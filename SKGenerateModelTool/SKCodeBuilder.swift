@@ -45,12 +45,12 @@ class SKCodeBuilder: NSObject {
         
         if key.isBlank { // Root model
             let modeName = modelName(with: key)
-            hString.appending("\n\n@interface \(modeName) : \(self.config.superClassName)\n\n")
-            mString.appending("\n\n@implementation \(modeName)\n\n")
+            hString.append("\n\n@interface \(modeName) : \(self.config.superClassName)\n\n")
+            mString.append("\n\n@implementation \(modeName)\n\n")
 
         } else { // sub model
-            hString.appending("\n\n@interface \(self.config.rootModelName) : \(self.config.superClassName)\n\n")
-            mString.appending("\n\n@implementation \(self.config.rootModelName)\n\n")
+            hString.append("\n\n@interface \(self.config.rootModelName) : \(self.config.superClassName)\n\n")
+            mString.append("\n\n@implementation \(self.config.rootModelName)\n\n")
         }
     }
     
@@ -73,13 +73,38 @@ class SKCodeBuilderConfig: NSObject {
     var superClassName = "NSObject"
     var rootModelName = "NSRootModel"
     var modelNamePrefix = "NS"
+    var authorName = "SKGenerateModelTool"
     var codeType: SKCodeBuilderCodeType = .OC
     var jsonType: SKCodeBuilderJSONModelType = .None
 }
 
 extension String {
+    
     var isBlank: Bool {
         let trimmedStr = self.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmedStr.isEmpty
+    }
+    
+    /// url 编码
+    func urlEncoding() -> String {
+        if self.isBlank { return self }
+        if let encodeUrl = self.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) {
+            return encodeUrl
+        }
+        return self
+    }
+    
+    /// string -> jsonObj
+    func _toJsonObj() -> Any? {
+        if self.isBlank { return nil }
+        if let jsonData = self.data(using: String.Encoding.utf8) {
+            do {
+                let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
+                return jsonObj
+            } catch let error {
+                print(error)
+            }
+        }
+        return nil
     }
 }
