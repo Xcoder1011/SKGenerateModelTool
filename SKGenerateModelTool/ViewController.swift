@@ -36,10 +36,9 @@ class ViewController: NSViewController {
     let ShouldGenerateFileCacheKey = "ShouldGenerateFileCacheKey"
     let GenerateFilePathCacheKey = "GenerateFilePathCacheKey"
     
-    /// cache key
-    var outputFilePath: String?
-
     var builder = SKCodeBuilder()
+
+    var outputFilePath: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,26 +60,24 @@ class ViewController: NSViewController {
     override func viewDidAppear() {
         loadUserLastInputContent()
     }
+        
+    // MARK: - IBAction
     
-    /// GET request URL
-    /// example url:
     ///
     /// 今日热榜（微博）:https://v1.alapi.cn/api/tophub/get?type=weibo
-    
+    ///
+    /// GET request URL
+
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
-        
+       
         var urlString = urlTF.stringValue
         if urlString.isBlank { return }
         urlString = urlString.urlEncoding()
         print("encode URL = \(urlTF.stringValue)")
-        
         UserDefaults.standard.setValue(urlString, forKey: LastInputURLCacheKey)
-        
         let session = URLSession.shared
         let task = session.dataTask(with: URL(string: urlString)!) { [weak self] (data, response, error) in
-           
             guard let data = data, error == nil else { return }
-            
             do {
                 let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
                 if JSONSerialization.isValidJSONObject(jsonObj) {
@@ -96,29 +93,15 @@ class ViewController: NSViewController {
         task.resume()
     }
     
-    /// config ui on main queue.
-    
-    func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
-        let attrString = NSAttributedString(string: text)
-        DispatchQueue.main.async {
-            textView.textStorage?.setAttributedString(attrString)
-            textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
-            textView.textStorage?.foregroundColor = color
-        }
-    }
-    
-    
     /// start generate code....
     
     @IBAction func startMakeCode(_ sender: NSButton) {
-        
+       
         let jsonString = jsonTextView.textStorage?.string
-        
         guard let jsonObj = jsonString?._toJsonObj() else {
             showAlertInfoWith("warn: input valid json string!", .warning)
             return
         }
-        
         guard JSONSerialization.isValidJSONObject(jsonObj) else {
             showAlertInfoWith("warn: is not a valid JSON !!!", .warning)
             return
@@ -137,11 +120,9 @@ class ViewController: NSViewController {
         
         if builder.config.codeType == .OC {
             builder.build_OC_code(with: jsonObj) { [weak self] (hString, mString) in
-                print(" hString = \(hString)")
-                print(" mString = \(mString)")
-
-                self?.configJsonTextView(text: hString as String, textView: self!.hTextView, color: NSColor.red)
-                self?.configJsonTextView(text: mString as String, textView: self!.mTextView, color: NSColor.red)
+                let color = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
+                self?.configJsonTextView(text: hString as String, textView: self!.hTextView, color: color)
+                self?.configJsonTextView(text: mString as String, textView: self!.mTextView, color: color)
             }
         }
     }
@@ -151,17 +132,29 @@ class ViewController: NSViewController {
         
     }
     
+    // MARK: - Private Method
     
-    func showAlertInfoWith( _ info: String, _ style:NSAlert.Style) {
+    private func showAlertInfoWith( _ info: String, _ style:NSAlert.Style) {
         let alert = NSAlert()
         alert.messageText = info
         alert.alertStyle = style
         alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
     }
     
+    /// config ui on main queue.
+    
+    private func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
+        let attrString = NSAttributedString(string: text)
+        DispatchQueue.main.async {
+            textView.textStorage?.setAttributedString(attrString)
+            textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
+            textView.textStorage?.foregroundColor = color
+        }
+    }
+    
     /// load cache
     
-    func loadUserLastInputContent() {
+    private func loadUserLastInputContent() {
         
         if let lastUrl = UserDefaults.standard.string(forKey: LastInputURLCacheKey)  {
             urlTF.stringValue = lastUrl
@@ -192,7 +185,8 @@ class ViewController: NSViewController {
     }
     
     /// MARK: save cache
-    func saveUserInputContent() {
+    
+    private func saveUserInputContent() {
         
         let superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
         UserDefaults.standard.setValue(superClassName, forKey: SuperClassNameCacheKey)
