@@ -118,21 +118,75 @@ class ViewController: NSViewController {
             print(" error = \(error)")
         }
         
-        if builder.config.codeType == .OC {
+        switch builder.config.codeType {
+        case .OC:
             builder.build_OC_code(with: jsonObj) { [weak self] (hString, mString) in
+                self?.hTextViewHeightPriority = self?.modifyConstraint(self?.hTextViewHeightPriority, 3/5.0)
                 let color = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
                 self?.configJsonTextView(text: hString as String, textView: self!.hTextView, color: color)
                 self?.configJsonTextView(text: mString as String, textView: self!.mTextView, color: color)
+                
+                guard let state = self?.generateFileBtn.state else { return }
+                guard state == .on else { return }
+                let outputFilePath = self?.outputFilePath
+                self?.builder.generate_OC_File(with: outputFilePath, hString: hString, mString: mString, complete: { (success, filePath) in
+                    if success {
+                        self?.showAlertInfoWith("生成文件路径在：\(filePath)", .informational)
+                        self?.outputFilePath = filePath
+                        self?.saveUserInputContent()
+                    }
+                })
             }
+        case .Swift:
+            builder.build_OC_code(with: jsonObj) { [weak self] (hString, mString) in
+                self?.hTextViewHeightPriority = self?.modifyConstraint(self?.hTextViewHeightPriority, 1.0)
+                let color = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
+                self?.configJsonTextView(text: hString as String, textView: self!.hTextView, color: color)
+                self?.configJsonTextView(text: mString as String, textView: self!.mTextView, color: color)
+                
+                guard let state = self?.generateFileBtn.state else { return }
+                guard state == .on else { return }
+                let outputFilePath = self?.outputFilePath
+                self?.builder.generate_OC_File(with: outputFilePath, hString: hString, mString: mString, complete: { (success, filePath) in
+                    if success {
+                        self?.showAlertInfoWith("生成文件路径在：\(filePath)", .informational)
+                        self?.outputFilePath = filePath
+                        self?.saveUserInputContent()
+                    }
+                })
+            }
+        default: break
         }
     }
     
     
     @IBAction func chooseOutputFilePath(_ sender: NSButton) {
-        
+        let openPanel = NSOpenPanel()
+        openPanel.canChooseFiles = false
+        openPanel.canChooseDirectories = true
+        let modal = openPanel.runModal()
+        if modal == .OK {
+            if let fileUrl = openPanel.urls.first{
+                outputFilePath = fileUrl.path
+            }
+        }
     }
     
     // MARK: - Private Method
+    
+    private func modifyConstraint( _ constraint: NSLayoutConstraint?, _ multiplier: CGFloat) -> NSLayoutConstraint? {
+        
+        guard let constraint = constraint else {
+            return nil
+        }
+        NSLayoutConstraint.deactivate([constraint])
+        let newConstraint = NSLayoutConstraint.init(item: constraint.firstItem as Any, attribute: constraint.firstAttribute, relatedBy: constraint.relation, toItem: constraint.secondItem, attribute: constraint.secondAttribute, multiplier: multiplier, constant: 0)
+        newConstraint.identifier = constraint.identifier;
+        newConstraint.priority = constraint.priority;
+        newConstraint.shouldBeArchived = constraint.shouldBeArchived;
+        NSLayoutConstraint .activate([newConstraint])
+        return newConstraint
+    }
     
     private func showAlertInfoWith( _ info: String, _ style:NSAlert.Style) {
         let alert = NSAlert()

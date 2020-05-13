@@ -37,13 +37,92 @@ class SKCodeBuilder: NSObject {
         let hString = NSMutableString()
         let mString = NSMutableString()
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
+        if config.superClassName == "NSObject" {
+            hString.insert("\n#import <Foundation/Foundation.h>\n\n", at: 0)
+        } else {
+            hString.insert("\n#import \"\(config.superClassName).h\"\n\n", at: 0)
+        }
+        mString.insert("\n#import \"\(config.rootModelName).h\"\n\n", at: 0)
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        let time = dateFormatter.string(from: Date())
+        let year = time.components(separatedBy: "/").first ?? "2020"
+       
+        let hCommentString =
+        """
+        //
+        //  \(config.rootModelName).h
+        //  SKCodeBuilder
+        //
+        //  Created by \(config.authorName) on \(time).
+        //  Copyright © \(year) SKCodeBuilder. All rights reserved.
+        //\n
+        """
+        
+        let mCommentString =
+        """
+        //
+        //  \(config.rootModelName).m
+        //  SKCodeBuilder
+        //
+        //  Created by \(config.authorName) on \(time).
+        //  Copyright © \(year) SKCodeBuilder. All rights reserved.
+        //\n
+        """
+        
+        hString.insert(hCommentString, at: 0)
+        mString.insert(mCommentString, at: 0)
+
         if let handler = complete  {
             handler(hString, mString)
         }
     }
     
-    func generate_OC_File(with filePath:String, hString:NSMutableString, mString:NSMutableString, complete:GenerateFileComplete) {
-        
+    func generate_OC_File(with filePath:String?, hString:NSMutableString, mString:NSMutableString, complete:GenerateFileComplete?) {
+        if hString.length > 0 && mString.length > 0 {
+
+            var filePath = filePath
+            var success = false
+            
+            if filePath == nil {
+                if let desktopPath = NSSearchPathForDirectoriesInDomains(.desktopDirectory, .userDomainMask, false).last {
+                    let path = desktopPath.appending("/SKGenerateModelToolFiles")
+                    print("path = \(path)")
+                    var isDir = ObjCBool.init(false)
+                    let isExists = FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+                    if isDir.boolValue && isExists {
+                       filePath = path
+                    } else {
+                        do {
+                            try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+                            filePath = path
+                        } catch let error {
+                            print("createDirectory error = \(error)")
+                            success = false
+                        }
+                    }
+                }
+            }
+            
+            let fileNameH = filePath?.appending("/\(config.rootModelName).h")
+            let fileNameM = filePath?.appending("/\(config.rootModelName).m")
+
+            do {
+                try hString.write(toFile: fileNameH!, atomically: true, encoding: String.Encoding.utf8.rawValue)
+                try mString.write(toFile: fileNameM!, atomically: true, encoding: String.Encoding.utf8.rawValue)
+                success = true
+            } catch  {
+                success = false
+            }
+            
+            print("fileNameH = \(fileNameH!)")
+            print("fileNameM = \(fileNameM!)")
+
+            if let complete = complete {
+                complete(success, filePath!)
+            }
+        }
     }
     
     // MARK: - Private Handler
@@ -51,13 +130,14 @@ class SKCodeBuilder: NSObject {
     private func handleDictValue(dictValue:Any, key:String, hString:NSMutableString, mString:NSMutableString) {
         
         if key.isBlank { // Root model
-            hString.append("\n\n@interface \(self.config.rootModelName) : \(self.config.superClassName)\n\n")
-            mString.append("\n\n@implementation \(self.config.rootModelName)\n\n")
+            hString.append("\n@interface \(self.config.rootModelName) : \(self.config.superClassName)\n\n")
+            mString.append("\n@implementation \(self.config.rootModelName)\n\n")
             
         } else { // sub model
             let modeName = modelClassName(with: key)
-            hString.append("\n\n@interface \(modeName) : \(self.config.superClassName)\n\n")
-            mString.append("\n\n@implementation \(modeName)\n\n")
+            hString.insert("@class \(modeName);\n", at: 0)
+            hString.append("\n@interface \(modeName) : \(self.config.superClassName)\n\n")
+            mString.append("\n@implementation \(modeName)\n\n")
         }
         
         switch dictValue {
