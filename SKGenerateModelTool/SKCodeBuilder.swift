@@ -31,7 +31,6 @@ class SKCodeBuilder: NSObject {
     lazy var yymodelPropertyGenericClassDicts = NSMutableDictionary()
     lazy var handlePropertyMapper = NSMutableDictionary()
     
-    
     var fileTye:String {
         get {
             if config.codeType == .Swift {
@@ -381,10 +380,10 @@ class SKCodeBuilder: NSObject {
         }
     }
 
+    /// String
     
     private func handleIdStringValue(idValue: String, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
-         /// String
-        
+         
         if config.codeType == .OC {
             
             if key == "id" && !ignoreIdValue {
@@ -465,10 +464,8 @@ class SKCodeBuilder: NSObject {
             }
             
         case .MJExtension:
+            
             // 适配MJExtension
-            
-            /// 1.The generic class mapper for container properties.
-            
             var needLineBreak = false;
             if (self.yymodelPropertyGenericClassDicts.count > 0) {
                 mString.append("+ (NSDictionary *)mj_objectClassInArray\n")
@@ -481,13 +478,10 @@ class SKCodeBuilder: NSObject {
                 needLineBreak = true;
             }
             
-            /// 2.Custom property mapper.
-            
             if (self.handlePropertyMapper.count > 0) {
                 if (needLineBreak) {
                     mString.append("\n")
                 }
-                
                 mString.append("+ (NSDictionary *)mj_replacedKeyFromPropertyName\n")
                 mString.append("{\n     return @{\n")
                 for (key, obj) in self.handlePropertyMapper {
@@ -496,7 +490,6 @@ class SKCodeBuilder: NSObject {
                 mString.append("             };")
                 mString.append("\n}\n")
             }
-            
         default:
             break
         }

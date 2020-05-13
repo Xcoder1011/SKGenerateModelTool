@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     @IBOutlet weak var urlTF: NSTextField!
     @IBOutlet weak var jsonTextView: NSTextView!
@@ -39,6 +39,7 @@ class ViewController: NSViewController {
     var builder = SKCodeBuilder()
 
     var outputFilePath: String?
+    var currentInputTF: NSTextField?
     
     lazy var jsonTextColor = NSColor.blue
     lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
@@ -57,18 +58,15 @@ class ViewController: NSViewController {
         jsonTypeBtn.removeAllItems()
         jsonTypeBtn.addItems(withTitles: ["None","YYMode","MJExtension","HandyJSON"])
         jsonTypeBtn.selectItem(at: 0)
-        
     }
     
     override func viewDidAppear() {
+        super.viewDidAppear()
         loadUserLastInputContent()
     }
         
     // MARK: - IBAction
-    
-    ///
-    /// 今日热榜（微博）:https://v1.alapi.cn/api/tophub/get?type=weibo
-    ///
+
     /// GET request URL
 
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
@@ -155,7 +153,6 @@ class ViewController: NSViewController {
         }
     }
     
-    
     @IBAction func chooseOutputFilePath(_ sender: NSButton) {
         let openPanel = NSOpenPanel()
         openPanel.canChooseFiles = false
@@ -202,6 +199,31 @@ class ViewController: NSViewController {
         }
     }
     
+    // MARK: - NSControlTextEditingDelegate
+
+    func controlTextDidChange(_ obj: Notification) {
+        if let tf =  obj.object {
+            currentInputTF = tf as? NSTextField
+            NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(caculateInputContentWidth), object: nil)
+            self.perform(#selector(caculateInputContentWidth))
+        }
+    }
+    
+    @objc private func caculateInputContentWidth() {
+        if let tf =  currentInputTF {
+            let constraints = tf.constraints
+            let attributes = [NSAttributedString.Key.font : tf.font]
+            let string = NSString(string: tf.stringValue)
+            var strWidth = string.boundingRect(with: NSSizeFromCGSize(CGSize(width: Double(Float.greatestFiniteMagnitude), height: 22.0)), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: attributes as [NSAttributedString.Key : Any]).width + 10
+            strWidth = max(strWidth, 114)
+            constraints.forEach { (constraint) in
+                if constraint.firstAttribute == .width {
+                    constraint.constant = strWidth
+                }
+            }
+        }
+    }
+    
     /// load cache
     
     private func loadUserLastInputContent() {
@@ -234,7 +256,7 @@ class ViewController: NSViewController {
         generateFileBtn.state = UserDefaults.standard.bool(forKey: SupportJSONModelTypeCacheKey) ? .on : .off
     }
     
-    /// MARK: save cache
+    /// save cache
     
     private func saveUserInputContent() {
         
@@ -272,13 +294,9 @@ class ViewController: NSViewController {
         UserDefaults.standard.set(generateFileBtn.state == .on , forKey: ShouldGenerateFileCacheKey)
     }
     
-    
-
     override var representedObject: Any? {
         didSet {
         }
     }
-
-
 }
 
