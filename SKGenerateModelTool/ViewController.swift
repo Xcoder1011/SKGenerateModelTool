@@ -67,7 +67,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         
     // MARK: - IBAction
 
-    /// GET request URL
+    /// GET / POST request URL
 
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
        
@@ -77,7 +77,27 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         print("encode URL = \(urlTF.stringValue)")
         UserDefaults.standard.setValue(urlString, forKey: LastInputURLCacheKey)
         let session = URLSession.shared
-        let task = session.dataTask(with: URL(string: urlString)!) { [weak self] (data, response, error) in
+        
+        let url = URL(string: urlString)
+        var request = URLRequest(url: url!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+        
+        if reqTypeBtn.indexOfSelectedItem == 1 {
+            if let query = url?.query {
+                urlString = urlString.replacingOccurrences(of: query, with: "")
+                if urlString.hasSuffix("?") {
+                    urlString.removeLast()
+                }
+                request = URLRequest(url: URL(string: urlString)!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+                if let httpBody = query.data(using: .utf8) {
+                    print("httpBody query = \(query)")
+                    request.httpBody = httpBody
+                }
+            }
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            request.httpMethod = "POST"
+        }
+
+        let task = session.dataTask(with: request) { [weak self] (data, response, error) in
             guard let data = data, error == nil else { return }
             do {
                 let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)

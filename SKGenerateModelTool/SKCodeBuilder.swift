@@ -552,5 +552,16 @@ extension String {
         }
         return nil
     }
+    
+    func nsrangeOf(str:String) -> NSRange {
+        let nsString = NSString.init(string: self)
+        return nsString.range(of: str)
+    }
+    
+    func nsRange(from range: Range<String.Index>) -> NSRange {
+        let start: Int = self.distance(from: startIndex, to: range.lowerBound)
+        let end: Int = self.distance(from: startIndex, to: range.upperBound)
+        return NSMakeRange(start, end - start)
+    }
 }
 
