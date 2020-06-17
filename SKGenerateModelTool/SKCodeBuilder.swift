@@ -394,7 +394,7 @@ class SKCodeBuilder: NSObject {
                 if idValue.count > 12 {
                     hString.append("/** eg. \(key) */\n@property (nonatomic, copy) NSString *\(key);\n")
                 } else {
-                    hString.append("/** eg. \(idValue) */\n@property (nonatomic, assign) NSString *\(key);\n")
+                    hString.append("/** eg. \(idValue) */\n@property (nonatomic, copy) NSString *\(key);\n")
                 }
             }
             
@@ -453,7 +453,6 @@ class SKCodeBuilder: NSObject {
                 if (needLineBreak) {
                     mString.append("\n")
                 }
-                
                 mString.append("+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n")
                 mString.append("{\n     return @{\n")
                 for (key, obj) in self.handlePropertyMapper {
