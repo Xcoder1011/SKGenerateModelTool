@@ -56,7 +56,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         codeTypeBtn.selectItem(at: 0)
 
         jsonTypeBtn.removeAllItems()
-        jsonTypeBtn.addItems(withTitles: ["None","YYMode","MJExtension","HandyJSON"])
+        jsonTypeBtn.addItems(withTitles: ["None","YYModel","MJExtension","HandyJSON"])
         jsonTypeBtn.selectItem(at: 0)
     }
     

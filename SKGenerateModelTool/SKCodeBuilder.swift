@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import zlib
 
 enum SKCodeBuilderCodeType: Int {
     case OC = 1
@@ -561,6 +562,20 @@ extension String {
         let start: Int = self.distance(from: startIndex, to: range.lowerBound)
         let end: Int = self.distance(from: startIndex, to: range.upperBound)
         return NSMakeRange(start, end - start)
+    }
+    
+    /// url 编码
+    func _adler32() -> String {
+        if self.isBlank { return self }
+        var crc = crc32(0, nil, 0)
+        if let data = self.data(using: .utf8) {
+            let nData = NSData(data: data)
+            crc = crc32(crc, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count), uInt(data.count))
+            var adler = adler32(0, nil, 0)
+            adler = adler32(adler, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count),  uInt(data.count))
+            return "_\(adler ^ crc)"
+        }
+        return self
     }
 }
 

@@ -12,6 +12,8 @@
 		BC88CEA52467A8AA00A4828B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88CEA42467A8AA00A4828B /* Assets.xcassets */; };
 		BC88CEA82467A8AA00A4828B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC88CEA62467A8AA00A4828B /* Main.storyboard */; };
 		BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */; };
+		BCB184B424B8090500C2A5D3 /* SKEncryptTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */; };
+		BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,9 @@
 		BC88CEA92467A8AA00A4828B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC88CEAA2467A8AA00A4828B /* SKGenerateModelTool.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SKGenerateModelTool.entitlements; sourceTree = "<group>"; };
 		BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCodeBuilder.swift; sourceTree = "<group>"; };
+		BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKEncryptTool.swift; sourceTree = "<group>"; };
+		BCB184B524B85CC700C2A5D3 /* SKGenerateModelTool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SKGenerateModelTool-Bridging-Header.h"; sourceTree = "<group>"; };
+		BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +62,8 @@
 			children = (
 				BC88CEA02467A8A600A4828B /* AppDelegate.swift */,
 				BC88CEA22467A8A600A4828B /* ViewController.swift */,
+				BCB184B224B808AF00C2A5D3 /* SKEncryptString */,
+				BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */,
 				BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */,
 				BC88CEA42467A8AA00A4828B /* Assets.xcassets */,
 				BC88CEA62467A8AA00A4828B /* Main.storyboard */,
@@ -64,6 +71,15 @@
 				BC88CEAA2467A8AA00A4828B /* SKGenerateModelTool.entitlements */,
 			);
 			path = SKGenerateModelTool;
+			sourceTree = "<group>";
+		};
+		BCB184B224B808AF00C2A5D3 /* SKEncryptString */ = {
+			isa = PBXGroup;
+			children = (
+				BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */,
+				BCB184B524B85CC700C2A5D3 /* SKGenerateModelTool-Bridging-Header.h */,
+			);
+			path = SKEncryptString;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -98,6 +114,7 @@
 				TargetAttributes = {
 					BC88CE9C2467A8A600A4828B = {
 						CreatedOnToolsVersion = 11.3;
+						LastSwiftMigration = 1130;
 					};
 				};
 			};
@@ -136,8 +153,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */,
 				BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */,
 				BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */,
+				BCB184B424B8090500C2A5D3 /* SKEncryptTool.swift in Sources */,
 				BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,6 +292,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SKGenerateModelTool/SKGenerateModelTool.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -284,6 +304,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -292,6 +314,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SKGenerateModelTool/SKGenerateModelTool.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -303,6 +326,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
