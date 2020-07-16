@@ -77,7 +77,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         print("encode URL = \(urlTF.stringValue)")
         UserDefaults.standard.setValue(urlString, forKey: LastInputURLCacheKey)
         let session = URLSession.shared
-        
         let url = URL(string: urlString)
         var request = URLRequest(url: url!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
         
@@ -152,14 +151,10 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         } else if builder.config.codeType == .Swift {
             multiplier = 1.0
         }
-        
         hTextViewHeightPriority = modifyConstraint(hTextViewHeightPriority, multiplier)
-
         configJsonTextView(text: hString as String, textView: hTextView, color: codeTextColor)
-        
         let state = generateFileBtn.state
         guard state == .on else { return }
-        
         if let path = outputFilePath {
             builder.generateFile(with: path, hString: hString, mString: mString) { [weak self] (success, filePath) in
                 if success {
@@ -266,14 +261,11 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         if let outFilePath = UserDefaults.standard.string(forKey: GenerateFilePathCacheKey)  {
             outputFilePath = outFilePath
         }
-        
         builder.config.codeType = SKCodeBuilderCodeType(rawValue: UserDefaults.standard.integer(forKey: BuildCodeTypeCacheKey)) ?? .OC
         codeTypeBtn.selectItem(at: builder.config.codeType.rawValue - 1)
-        
         builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: UserDefaults.standard.integer(forKey: SupportJSONModelTypeCacheKey)) ?? .None
         jsonTypeBtn.selectItem(at: builder.config.jsonType.rawValue)
-                    
-        generateFileBtn.state = UserDefaults.standard.bool(forKey: SupportJSONModelTypeCacheKey) ? .on : .off
+        generateFileBtn.state = UserDefaults.standard.bool(forKey: ShouldGenerateFileCacheKey) ? .on : .off
     }
     
     /// save cache
@@ -309,7 +301,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                 builder.config.superClassName = "YYModel"
             }
         }
-        
         UserDefaults.standard.setValue(outputFilePath, forKey: GenerateFilePathCacheKey)
         UserDefaults.standard.set(generateFileBtn.state == .on , forKey: ShouldGenerateFileCacheKey)
     }

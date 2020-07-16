@@ -31,7 +31,8 @@ class SKCodeBuilder: NSObject {
     lazy var handleDicts = NSMutableDictionary()
     lazy var yymodelPropertyGenericClassDicts = NSMutableDictionary()
     lazy var handlePropertyMapper = NSMutableDictionary()
-    
+    lazy var allKeys = [String]()
+
     var fileTye:String {
         get {
             if config.codeType == .Swift {
@@ -45,13 +46,14 @@ class SKCodeBuilder: NSObject {
 
     func generateCode(with jsonObj:Any, complete:BuildComplete?){
         
+        allKeys.removeAll()
+        
         let hString = NSMutableString()
         let mString = NSMutableString()
         
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
         
         if config.codeType == .OC {
-            
             if config.superClassName == "NSObject" {
                 hString.insert("\n#import <Foundation/Foundation.h>\n\n", at: 0)
             } else {
@@ -159,11 +161,10 @@ class SKCodeBuilder: NSObject {
     }
     
     // MARK: - Private Handler
-
+    
     private func handleDictValue(dictValue:Any, key:String, hString:NSMutableString, mString:NSMutableString) {
-        
+
         if config.codeType == .OC {
-            
             if key.isBlank { // Root model
                 hString.append("\n@interface \(config.rootModelName) : \(config.superClassName)\n\n")
                 mString.append("\n@implementation \(config.rootModelName)\n\n")
@@ -174,9 +175,7 @@ class SKCodeBuilder: NSObject {
                 hString.append("\n@interface \(modelName) : \(config.superClassName)\n\n")
                 mString.append("\n@implementation \(modelName)\n\n")
             }
-            
         } else if config.codeType == .Swift {
-            
             if key.isBlank { // Root model
                 hString.append("\nclass \(config.rootModelName) : \(config.superClassName)\n\n")
                 
@@ -208,8 +207,8 @@ class SKCodeBuilder: NSObject {
                     
                 case _ as [String:Any]:
                     
+                    let key = handleMaybeSameKey(key)
                     let modelName = modelClassName(with: key)
-                    
                     if config.codeType == .OC {
                         hString.append("/** \(key) */\n@property (nonatomic, strong) \(modelName) *\(key);\n")
                         self.yymodelPropertyGenericClassDicts.setValue(modelName, forKey: key)
@@ -217,7 +216,6 @@ class SKCodeBuilder: NSObject {
                     } else if config.codeType == .Swift {
                         hString.append("    /// \n    var \(key): \(modelName)?\n")
                     }
-                    
                     self.handleDicts.setValue(value, forKey: key)
                     
                 case let arr as [Any]:
@@ -256,12 +254,10 @@ class SKCodeBuilder: NSObject {
         if !key.isBlank {
             self.handleDicts.removeObject(forKey: key)
         }
-        
         mString.append("\n@end\n\n")
 
         self.yymodelPropertyGenericClassDicts.removeAllObjects()
         self.handlePropertyMapper.removeAllObjects()
-        
         if self.handleDicts.count > 0 {
             let firstKey = self.handleDicts.allKeys.first as! String
             if let firstObject = self.handleDicts.value(forKey: firstKey) {
@@ -286,6 +282,8 @@ class SKCodeBuilder: NSObject {
                 }
                 else if (firstObject is [String:Any]) {
                     // Dictionary 类型
+                    let key = handleMaybeSameKey(key)
+                    
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
                     self.yymodelPropertyGenericClassDicts.setValue(modeName, forKey: key)
@@ -310,6 +308,7 @@ class SKCodeBuilder: NSObject {
                 }
                 else if (firstObject is [String:Any]) {
                     // Dictionary 类型
+                    let key = handleMaybeSameKey(key)
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
                     hString.append("    /// \n    var \(key): [\(modeName)]?\n")
@@ -386,7 +385,6 @@ class SKCodeBuilder: NSObject {
     private func handleIdStringValue(idValue: String, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
          
         if config.codeType == .OC {
-            
             if key == "id" && !ignoreIdValue {
                 // 字符串id 替换成 itemId
                 self.handlePropertyMapper.setValue("id", forKey: "itemId")
@@ -398,9 +396,7 @@ class SKCodeBuilder: NSObject {
                     hString.append("/** eg. \(idValue) */\n@property (nonatomic, copy) NSString *\(key);\n")
                 }
             }
-            
         } else if config.codeType == .Swift {
-            
             if key == "id" && !ignoreIdValue {
                 self.handlePropertyMapper.setValue("id", forKey: "itemId")
                 hString.append("    /// \(idValue)\n    var itemId: String?\n")
@@ -433,9 +429,7 @@ class SKCodeBuilder: NSObject {
         switch config.jsonType {
         case .YYModel:
             // 适配YYModel
-            
             /// 1.The generic class mapper for container properties.
-            
             var needLineBreak = false;
             if (self.yymodelPropertyGenericClassDicts.count > 0) {
                 mString.append("+ (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass\n")
@@ -449,7 +443,6 @@ class SKCodeBuilder: NSObject {
             }
             
             /// 2.Custom property mapper.
-            
             if (self.handlePropertyMapper.count > 0) {
                 if (needLineBreak) {
                     mString.append("\n")
@@ -464,7 +457,6 @@ class SKCodeBuilder: NSObject {
             }
             
         case .MJExtension:
-            
             // 适配MJExtension
             var needLineBreak = false;
             if (self.yymodelPropertyGenericClassDicts.count > 0) {
@@ -495,8 +487,17 @@ class SKCodeBuilder: NSObject {
         }
     }
     
+    /// 处理可能出现相同的key的问题
+    private func handleMaybeSameKey( _ key:String) -> String {
+        var tempKey = key
+        if allKeys.contains(key) {
+            tempKey = "\(key)2"
+        }
+        allKeys.append(tempKey)
+        return tempKey
+    }
+
     /// 生成类名
-    
     private func modelClassName(with key:String) -> String {
         if key.isBlank { return config.rootModelName }
         let firstCharacterIndex = key.index(key.startIndex, offsetBy: 1)
@@ -505,6 +506,7 @@ class SKCodeBuilder: NSObject {
         let start = String.Index.init(utf16Offset: 0, in: key)
         let end = String.Index.init(utf16Offset: 1, in: key)
         var modelName = key.replacingCharacters(in: start..<end, with: firstCharacter)
+        
         if !modelName.hasPrefix(config.modelNamePrefix) {
             modelName = config.modelNamePrefix + modelName
         }
