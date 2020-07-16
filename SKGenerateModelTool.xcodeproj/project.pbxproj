@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC6E5D5224C0770800809D98 /* EncryptExampleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC6E5D5124C0770800809D98 /* EncryptExampleModel.m */; };
 		BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88CEA02467A8A600A4828B /* AppDelegate.swift */; };
 		BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88CEA22467A8A600A4828B /* ViewController.swift */; };
 		BC88CEA52467A8AA00A4828B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88CEA42467A8AA00A4828B /* Assets.xcassets */; };
@@ -17,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BC6E5BD824C071EE00809D98 /* SKEncryptHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKEncryptHeader.h; sourceTree = "<group>"; };
+		BC6E5D5024C0770800809D98 /* EncryptExampleModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncryptExampleModel.h; sourceTree = "<group>"; };
+		BC6E5D5124C0770800809D98 /* EncryptExampleModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncryptExampleModel.m; sourceTree = "<group>"; };
 		BC88CE9D2467A8A600A4828B /* SKGenerateModelTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKGenerateModelTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC88CEA02467A8A600A4828B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BC88CEA22467A8A600A4828B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -76,8 +80,11 @@
 		BCB184B224B808AF00C2A5D3 /* SKEncryptString */ = {
 			isa = PBXGroup;
 			children = (
+				BC6E5BD824C071EE00809D98 /* SKEncryptHeader.h */,
 				BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */,
 				BCB184B524B85CC700C2A5D3 /* SKGenerateModelTool-Bridging-Header.h */,
+				BC6E5D5024C0770800809D98 /* EncryptExampleModel.h */,
+				BC6E5D5124C0770800809D98 /* EncryptExampleModel.m */,
 			);
 			path = SKEncryptString;
 			sourceTree = "<group>";
@@ -153,6 +160,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC6E5D5224C0770800809D98 /* EncryptExampleModel.m in Sources */,
 				BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */,
 				BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */,
 				BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */,
