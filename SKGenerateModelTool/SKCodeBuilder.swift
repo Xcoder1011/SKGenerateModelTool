@@ -492,6 +492,7 @@ class SKCodeBuilder: NSObject {
         var tempKey = key
         if allKeys.contains(key) {
             tempKey = "\(key)2"
+            self.handlePropertyMapper.setValue(key, forKey: tempKey)
         }
         allKeys.append(tempKey)
         return tempKey
@@ -500,15 +501,39 @@ class SKCodeBuilder: NSObject {
     /// 生成类名
     private func modelClassName(with key:String) -> String {
         if key.isBlank { return config.rootModelName }
-        let firstCharacterIndex = key.index(key.startIndex, offsetBy: 1)
-        var firstCharacter = String(key[..<firstCharacterIndex])
-        firstCharacter = firstCharacter.uppercased()
-        let start = String.Index.init(utf16Offset: 0, in: key)
-        let end = String.Index.init(utf16Offset: 1, in: key)
-        var modelName = key.replacingCharacters(in: start..<end, with: firstCharacter)
-        
+        let strings = key.components(separatedBy: "_")
+        let mutableString = NSMutableString()
+        var modelName:String
+        if !strings.isEmpty {
+            for str in strings {
+                let firstCharacterIndex = str.index(str.startIndex, offsetBy: 1)
+                var firstCharacter = String(str[..<firstCharacterIndex])
+                firstCharacter = firstCharacter.uppercased()
+                let start = String.Index.init(utf16Offset: 0, in: str)
+                let end = String.Index.init(utf16Offset: 1, in: str)
+                let str = str.replacingCharacters(in: start..<end, with: firstCharacter)
+                mutableString.append(str)
+            }
+            modelName = mutableString as String
+        } else {
+            let firstCharacterIndex = key.index(key.startIndex, offsetBy: 1)
+            var firstCharacter = String(key[..<firstCharacterIndex])
+            firstCharacter = firstCharacter.uppercased()
+            let start = String.Index.init(utf16Offset: 0, in: key)
+            let end = String.Index.init(utf16Offset: 1, in: key)
+            modelName = key.replacingCharacters(in: start..<end, with: firstCharacter)
+        }
         if !modelName.hasPrefix(config.modelNamePrefix) {
             modelName = config.modelNamePrefix + modelName
+        }
+        if config.superClassName.hasSuffix("Item") {
+            if !modelName.hasSuffix("Item") {
+                modelName = modelName + "Item"
+            }
+        } else {
+            if !modelName.hasSuffix("Model") {
+                modelName = modelName + "Model"
+            }
         }
         return modelName
     }
