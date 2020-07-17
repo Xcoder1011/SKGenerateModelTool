@@ -1,14 +1,16 @@
 # SKGenerateModelTool
 
 
-- #####支持通过URL链接或json字符串一键生成model文件
-- #####支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
-- #####支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名
-- #####支持OC / Swift 
-- #####支持自定义输出文件夹路径
-- #####兼容YYModel / MJExtension / HandyJSON解析
-- #####兼容服务端返回“id”字段
-- #####支持类驼峰命名
+![SKGenerateModelTool](https://upload-images.jianshu.io/upload_images/1129777-9c130b4ce345ddf9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 支持通过URL链接或json字符串一键生成model文件
+- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
+- 支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名
+- 支持OC / Swift 
+- 支持自定义输出文件夹路径
+- 兼容YYModel / MJExtension / HandyJSON解析
+- 兼容服务端返回“id”字段
+- 支持类驼峰命名
 
 - Supports one-click generation of model files through URL links or json strings
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
@@ -19,7 +21,6 @@
 - Compatible server returns "id" field
 - Supports hump naming
 
-![SKGenerateModelTool](https://upload-images.jianshu.io/upload_images/1129777-9c130b4ce345ddf9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ###### 生成Model
 ![生成Model](https://upload-images.jianshu.io/upload_images/1129777-51a3b41012e11c96.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
