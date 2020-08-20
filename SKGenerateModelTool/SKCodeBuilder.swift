@@ -26,33 +26,26 @@ typealias BuildComplete = (NSMutableString, NSMutableString) -> ()
 typealias GenerateFileComplete = (Bool, String) -> ()
 
 class SKCodeBuilder: NSObject {
-
     var config = SKCodeBuilderConfig()
     lazy var handleDicts = NSMutableDictionary()
     lazy var yymodelPropertyGenericClassDicts = NSMutableDictionary()
     lazy var handlePropertyMapper = NSMutableDictionary()
     lazy var allKeys = [String]()
-
+    var commentDicts:[String:String]?  // 适配json文件的注释
+    
     var fileTye:String {
         get {
-            if config.codeType == .Swift {
-                return "swift"
-            }
+            if config.codeType == .Swift { return "swift" }
             return "h"
         }
     }
-
     // MARK: - Public
-
     func generateCode(with jsonObj:Any, complete:BuildComplete?){
         
         allKeys.removeAll()
-        
         let hString = NSMutableString()
         let mString = NSMutableString()
-        
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
-        
         if config.codeType == .OC {
             if config.superClassName == "NSObject" {
                 hString.insert("\n#import <Foundation/Foundation.h>\n\n", at: 0)
@@ -60,7 +53,6 @@ class SKCodeBuilder: NSObject {
                 hString.insert("\n#import \"\(config.superClassName).h\"\n\n", at: 0)
             }
             mString.insert("\n#import \"\(config.rootModelName).h\"\n\n", at: 0)
-            
         } else if config.codeType == .Swift {
             if (config.jsonType == .HandyJSON) {
                 hString.insert("import HandyJSON\n\n", at: 0)
@@ -76,10 +68,10 @@ class SKCodeBuilder: NSObject {
         """
         //
         //  \(config.rootModelName).\(fileTye)
-        //  SKCodeBuilder
+        //  SKGenerateModelTool
         //
         //  Created by \(config.authorName) on \(time).
-        //  Copyright © \(year) SKCodeBuilder. All rights reserved.
+        //  Copyright © \(year) SKGenerateModelTool. All rights reserved.
         //\n
         """
         
@@ -87,16 +79,15 @@ class SKCodeBuilder: NSObject {
         """
         //
         //  \(config.rootModelName).m
-        //  SKCodeBuilder
+        //  SKGenerateModelTool
         //
         //  Created by \(config.authorName) on \(time).
-        //  Copyright © \(year) SKCodeBuilder. All rights reserved.
+        //  Copyright © \(year) SKGenerateModelTool. All rights reserved.
         //\n
         """
         
         hString.insert(hCommentString, at: 0)
         mString.insert(mCommentString, at: 0)
-
         if let handler = complete  {
             handler(hString, mString)
         }
@@ -107,7 +98,6 @@ class SKCodeBuilder: NSObject {
 
             var filePath = filePath
             var success = false
-            
             if filePath == nil {
                 if let desktopPath = NSSearchPathForDirectoriesInDomains(.desktopDirectory, .userDomainMask, false).last {
                     let path = desktopPath.appending("/SKGenerateModelToolFiles")
@@ -129,7 +119,6 @@ class SKCodeBuilder: NSObject {
             }
             
             var fileNameH = "", fileNameM = ""
-            
             if let filePath = filePath {
                 if config.codeType == .OC {
                     fileNameH = filePath.appending("/\(config.rootModelName).h")
@@ -137,7 +126,6 @@ class SKCodeBuilder: NSObject {
                 } else if config.codeType == .Swift {
                     fileNameH = filePath.appending("/\(config.rootModelName).swift")
                 }
-                
                 do {
                     if !fileNameH.isBlank {
                         try hString.write(toFile: fileNameH, atomically: true, encoding: String.Encoding.utf8.rawValue)
@@ -149,11 +137,7 @@ class SKCodeBuilder: NSObject {
                 } catch  {
                     success = false
                 }
-                
-                print("fileNameH = \(fileNameH)")
-                print("fileNameM = \(fileNameM)")
             }
-            
             if let complete = complete {
                 complete(success, filePath!)
             }
@@ -168,7 +152,6 @@ class SKCodeBuilder: NSObject {
             if key.isBlank { // Root model
                 hString.append("\n@interface \(config.rootModelName) : \(config.superClassName)\n\n")
                 mString.append("\n@implementation \(config.rootModelName)\n\n")
-                
             } else { // sub model
                 let modelName = modelClassName(with: key)
                 hString.insert("@class \(modelName);\n", at: 0)
@@ -178,7 +161,6 @@ class SKCodeBuilder: NSObject {
         } else if config.codeType == .Swift {
             if key.isBlank { // Root model
                 hString.append("\nclass \(config.rootModelName) : \(config.superClassName)\n\n")
-                
             } else { // sub model
                 let modelName = modelClassName(with: key)
                 hString.append("\n\nclass \(modelName) : \(config.superClassName) {\n\n")
@@ -212,7 +194,6 @@ class SKCodeBuilder: NSObject {
                     if config.codeType == .OC {
                         hString.append("/** \(key) */\n@property (nonatomic, strong) \(modelName) *\(key);\n")
                         self.yymodelPropertyGenericClassDicts.setValue(modelName, forKey: key)
-
                     } else if config.codeType == .Swift {
                         hString.append("    /// \n    var \(key): \(modelName)?\n")
                     }
@@ -225,7 +206,7 @@ class SKCodeBuilder: NSObject {
                 default:
                     // 识别不出类型
                     if config.codeType == .OC {
-                        hString.append("/** <#识别不出类型#> */\n@property (nonatomic, strong) id \(key);\n")
+                        hString.append("/** <#泛型#> */\n@property (nonatomic, strong) id \(key);\n")
                     } else if config.codeType == .Swift {
                         hString.append("    /// \(key)\n    var \(key): Any?\n")
                     }
@@ -245,17 +226,14 @@ class SKCodeBuilder: NSObject {
         if config.codeType == .OC {
             hString.append("\n@end\n\n")
             handleJsonType(hString: hString, mString: mString)
-
         } else if config.codeType == .Swift {
             handleJsonType(hString: hString, mString: mString)
             hString.append("}\n")
         }
-        
         if !key.isBlank {
             self.handleDicts.removeObject(forKey: key)
         }
         mString.append("\n@end\n\n")
-
         self.yymodelPropertyGenericClassDicts.removeAllObjects()
         self.handlePropertyMapper.removeAllObjects()
         if self.handleDicts.count > 0 {
@@ -271,54 +249,47 @@ class SKCodeBuilder: NSObject {
         guard arrayValue.count > 0 else {
             return
         }
-        
         if config.codeType == .OC {
-            
             if let firstObject = arrayValue.first  {
-                
                 if firstObject is String {
                     // String 类型
-                    hString.append("/** \(key) */\n@property (nonatomic, strong) NSArray <NSString *> *\(key);\n")
+                    hString.append("/** \(commentName(key, firstObject as! String)) */\n@property (nonatomic, strong) NSArray <NSString *> *\(key);\n")
                 }
                 else if (firstObject is [String:Any]) {
                     // Dictionary 类型
                     let key = handleMaybeSameKey(key)
-                    
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
                     self.yymodelPropertyGenericClassDicts.setValue(modeName, forKey: key)
-                    hString.append("/** \(key) */\n@property (nonatomic, strong) NSArray <\(modeName) *> *\(key);\n")
+                    hString.append("/** \(commentName(key, key)) */\n@property (nonatomic, strong) NSArray <\(modeName) *> *\(key);\n")
                 }
                 else if (firstObject is [Any]) {
                     // Array 类型
                     handleArrayValue(arrayValue: firstObject as! [Any] , key: key, hString: hString)
                 }
                 else {
-                    hString.append("/** \(key) */\n@property (nonatomic, strong) NSArray *\(key);\n")
+                    hString.append("/** \(commentName(key, key)) */\n@property (nonatomic, strong) NSArray *\(key);\n")
                 }
             }
-            
         } else if config.codeType == .Swift {
-            
             if let firstObject = arrayValue.first  {
-                
                 if firstObject is String {
                     // String 类型
-                    hString.append("    /// \n    var \(key): [String]?\n")
+                    hString.append("    /// \(commentName(key, firstObject as! String, false)) \n    var \(key): [String]?\n")
                 }
                 else if (firstObject is [String:Any]) {
                     // Dictionary 类型
                     let key = handleMaybeSameKey(key)
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
-                    hString.append("    /// \n    var \(key): [\(modeName)]?\n")
+                    hString.append("    ///  \(commentName(key, key, false)) \n    var \(key): [\(modeName)]?\n")
                 }
                 else if (firstObject is [Any]) {
                     // Array 类型
                     handleArrayValue(arrayValue: firstObject as! [Any] , key: key, hString: hString)
                 }
                 else {
-                    hString.append("    /// \n    var \(key): [Any]?\n")
+                    hString.append("    /// \(commentName(key, key, false)) \n    var \(key): [Any]?\n")
                 }
             }
         }
@@ -335,18 +306,18 @@ class SKCodeBuilder: NSObject {
         case .doubleType, .floatType, .float32Type, .float64Type, .cgFloatType:
             /// 浮点型
             if config.codeType == .OC {
-                hString.append("/** eg. \(numValue) */\n@property (nonatomic, assign) CGFloat \(key);\n")
+                hString.append("/** eg. \(commentName(key, "\(numValue)")) */\n@property (nonatomic, assign) CGFloat \(key);\n")
             } else if config.codeType == .Swift {
-                hString.append("    /// \(numValue)\n    var \(key): Double?\n")
+                hString.append("    /// \(commentName(key, "\(numValue)"))\n    var \(key): Double?\n")
             }
        
         case .charType:
             if numValue.int32Value == 0 || numValue.int32Value == 1 {
                 /// Bool 类型
                 if config.codeType == .OC {
-                    hString.append("/** eg. \(numValue) */\n@property (nonatomic, assign) BOOL \(key);\n")
+                    hString.append("/** eg. \(commentName(key, "\(numValue)")) */\n@property (nonatomic, assign) BOOL \(key);\n")
                 } else if config.codeType == .Swift {
-                    hString.append("    /// \(numValue.boolValue == true ? "true" : "false")\n    var \(key): Bool = false\n")
+                    hString.append("    /// \(commentName(key, (numValue.boolValue == true ? "true" : "false")))\n    var \(key): Bool = false\n")
                 }
             } else {
                 handleIdStringValue(idValue: numValue.stringValue, key: key, hString: hString, ignoreIdValue: ignoreIdValue)
@@ -364,18 +335,19 @@ class SKCodeBuilder: NSObject {
     
     private func handleIdIntValue(intValue: Int, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
         /// Int
+        let comment = (commentName(key, "\(intValue)"))
         if key == "id" && !ignoreIdValue {
             self.handlePropertyMapper.setValue("id", forKey: "itemId")
             if config.codeType == .OC {
-                hString.append("/** eg. \(intValue) */\n@property (nonatomic, assign) NSInteger itemId;\n")
+                hString.append("/** eg. \(comment) */\n@property (nonatomic, assign) NSInteger itemId;\n")
             } else if config.codeType == .Swift {
-                hString.append("    /// \(intValue)\n    var itemId: Int = 0\n")
+                hString.append("    /// \(comment)\n    var itemId: Int = 0\n")
             }
         } else {
             if config.codeType == .OC {
-                hString.append("/** eg. \(intValue) */\n@property (nonatomic, assign) NSInteger \(key);\n")
+                hString.append("/** eg. \(comment) */\n@property (nonatomic, assign) NSInteger \(key);\n")
             } else if config.codeType == .Swift {
-                hString.append("    /// \(intValue)\n    var \(key): Int = 0\n")
+                hString.append("    /// \(comment)\n    var \(key): Int = 0\n")
             }
         }
     }
@@ -388,27 +360,24 @@ class SKCodeBuilder: NSObject {
             if key == "id" && !ignoreIdValue {
                 // 字符串id 替换成 itemId
                 self.handlePropertyMapper.setValue("id", forKey: "itemId")
-                hString.append("/** eg. \(idValue) */\n@property (nonatomic, copy) NSString *itemId;\n")
+                hString.append("/** eg. \(commentName(key, idValue)) */\n@property (nonatomic, copy) NSString *itemId;\n")
             } else {
-                if idValue.count > 12 {
-                    hString.append("/** eg. \(key) */\n@property (nonatomic, copy) NSString *\(key);\n")
-                } else {
-                    hString.append("/** eg. \(idValue) */\n@property (nonatomic, copy) NSString *\(key);\n")
-                }
+                hString.append("/** eg. \(commentName(key, idValue)) */\n@property (nonatomic, copy) NSString *\(key);\n")
             }
         } else if config.codeType == .Swift {
             if key == "id" && !ignoreIdValue {
                 self.handlePropertyMapper.setValue("id", forKey: "itemId")
-                hString.append("    /// \(idValue)\n    var itemId: String?\n")
+                hString.append("    /// \(commentName(key, idValue))\n    var itemId: String?\n")
             } else {
                 if idValue.count > 12 {
-                    hString.append("    /// \n    var \(key): String?\n")
+                    hString.append("    /// \(commentName(key, idValue, false))\n    var \(key): String?\n")
                 } else {
-                    hString.append("    /// \(idValue)\n    var \(key): String?\n")
+                    hString.append("    /// \(commentName(key, idValue))\n    var \(key): String?\n")
                 }
             }
         }
     }
+    
     
      /// 处理json解析
 
@@ -444,9 +413,7 @@ class SKCodeBuilder: NSObject {
             
             /// 2.Custom property mapper.
             if (self.handlePropertyMapper.count > 0) {
-                if (needLineBreak) {
-                    mString.append("\n")
-                }
+                if (needLineBreak) { mString.append("\n") }
                 mString.append("+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n")
                 mString.append("{\n     return @{\n")
                 for (key, obj) in self.handlePropertyMapper {
@@ -471,9 +438,7 @@ class SKCodeBuilder: NSObject {
             }
             
             if (self.handlePropertyMapper.count > 0) {
-                if (needLineBreak) {
-                    mString.append("\n")
-                }
+                if (needLineBreak) { mString.append("\n") }
                 mString.append("+ (NSDictionary *)mj_replacedKeyFromPropertyName\n")
                 mString.append("{\n     return @{\n")
                 for (key, obj) in self.handlePropertyMapper {
@@ -537,6 +502,21 @@ class SKCodeBuilder: NSObject {
         }
         return modelName
     }
+    
+    /// 生成注释
+    private func commentName(_ key:String, _ value:String, _ show:Bool=true) -> String {
+        var comment = value
+        if value.count > 12 {
+            comment = key
+            if !show {comment = ""}
+        }
+        if let commentDict = commentDicts,commentDict.count > 0 {
+            if let commentValue = commentDict[key] {
+                comment = commentValue
+            }
+        }
+        return comment
+    }
 }
 
 // MARK: - Config
@@ -589,6 +569,17 @@ extension String {
         let start: Int = self.distance(from: startIndex, to: range.lowerBound)
         let end: Int = self.distance(from: startIndex, to: range.upperBound)
         return NSMakeRange(start, end - start)
+    }
+    
+    /// 在字符串中查找另一字符串首次出现的位置（或最后一次出现位置）
+    func postionOf(sub:String,backwards:Bool = false) -> Int {
+        var pos = -1
+        if let range = range(of: sub, options: backwards ? .backwards : .literal, range: nil, locale: nil) {
+            if !range.isEmpty {
+                pos = self.distance(from: startIndex, to: range.lowerBound)
+            }
+        }
+        return pos
     }
     
     /// url 编码

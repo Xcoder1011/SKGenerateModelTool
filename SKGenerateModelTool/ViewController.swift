@@ -117,29 +117,78 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     @IBAction func startMakeCode(_ sender: NSButton) {
        
-        let jsonString = jsonTextView.textStorage?.string
-        guard let jsonObj = jsonString?._toJsonObj() else {
-            showAlertInfoWith("warn: input valid json string!", .warning)
-            return
-        }
-        guard JSONSerialization.isValidJSONObject(jsonObj) else {
-            showAlertInfoWith("warn: is not a valid JSON !!!", .warning)
-            return
-        }
-        
-        saveUserInputContent()
-        
-        do {
-            let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
-            if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
-                configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+        if let jsonString = jsonTextView.textStorage?.string {
+            if jsonString.isBlank { return }
+            var trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
+            trimmedStr = trimmedStr .replacingOccurrences(of: "”", with: "\"")
+            trimmedStr = trimmedStr .replacingOccurrences(of: "，", with: ",")
+            let attriStr = NSMutableString(string: trimmedStr)
+            var commentDicts:[String:String] = [:]
+            attriStr.enumerateLines { (line, _) in
+                if line.contains("//") {
+                    let substrings = line.components(separatedBy: "//")
+                    let hasHttpLink = line.contains("http://") || line.contains("https://")
+                   
+                    // 只有图片链接 且没注释的情况下 不做截断操作
+                    let cannComment = !(substrings.count == 2 && hasHttpLink)
+                    guard cannComment else {
+                        return
+                    }
+                   
+                    let trimmedLineStr = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let position = trimmedLineStr.postionOf(sub: "//",backwards: true)
+                    if position >= 0 {
+                        let linestr = trimmedLineStr.prefix(position)
+                        var keystr = String(linestr).trimmingCharacters(in: .whitespacesAndNewlines)
+                        let commentstr = trimmedLineStr.suffix(trimmedLineStr.count - position)
+                        if keystr.contains(":") {
+                          let lines = keystr.components(separatedBy: ":")
+                            keystr = lines.first ?? ""
+                            keystr = keystr.replacingOccurrences(of: "\"", with: "")
+                            keystr = keystr.trimmingCharacters(in: .whitespacesAndNewlines)
+                            print("keystr = \(lines.first ?? "")")
+                            print("commentstr = \(commentstr)")
+                            commentDicts.updateValue(String(commentstr), forKey: keystr)
+                        }
+                        let range = attriStr.range(of: String(commentstr))
+                        attriStr.replaceCharacters(in: range, with: "")
+                    }
+                }
             }
-        } catch let error {
-            print(" error = \(error)")
-        }
-        
-        builder.generateCode(with: jsonObj) { [weak self] (hString, mString) in
-            self?.handleGeneratedCode(hString, mString)
+            
+            print("commentDicts = \(commentDicts)")
+
+            let jsonStr = attriStr
+            guard let jsonData = jsonStr.data(using: String.Encoding.utf8.rawValue) else {
+                showAlertInfoWith("warn: input valid json string!", .warning)
+                return
+            }
+            do {
+                let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
+                guard JSONSerialization.isValidJSONObject(jsonObj) else {
+                    showAlertInfoWith("warn: is not a valid JSON !!!", .warning)
+                    return
+                }
+                if commentDicts.count > 0 {
+                    configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+                    builder.commentDicts = commentDicts
+                } else {
+                    builder.commentDicts = nil
+                    let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
+                    if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
+                        configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+                    }
+                }
+                saveUserInputContent()
+                builder.generateCode(with: jsonObj) { [weak self] (hString, mString) in
+                    self?.handleGeneratedCode(hString, mString)
+                }
+            } catch let error as NSError {
+                print(" error = \(error)")
+                if let errorInfo = error.userInfo["NSDebugDescription"] {
+                    showAlertInfoWith("Invalid json: \(errorInfo)", .warning)
+                }
+            }
         }
     }
     
