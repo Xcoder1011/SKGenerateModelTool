@@ -39,7 +39,9 @@ class SKCodeBuilder: NSObject {
             return "h"
         }
     }
+    
     // MARK: - Public
+    
     func generateCode(with jsonObj:Any, complete:BuildComplete?){
         
         allKeys.removeAll()
@@ -208,7 +210,7 @@ class SKCodeBuilder: NSObject {
                     if config.codeType == .OC {
                         hString.append("/** <#泛型#> */\n@property (nonatomic, strong) id \(key);\n")
                     } else if config.codeType == .Swift {
-                        hString.append("    /// \(key)\n    var \(key): Any?\n")
+                        hString.append("    /// <#泛型#>\n    var \(key): Any?\n")
                     }
                 }
             }
@@ -253,7 +255,7 @@ class SKCodeBuilder: NSObject {
             if let firstObject = arrayValue.first  {
                 if firstObject is String {
                     // String 类型
-                    hString.append("/** \(commentName(key, firstObject as! String)) */\n@property (nonatomic, strong) NSArray <NSString *> *\(key);\n")
+                    hString.append("/** eg. \(commentName(key, firstObject as! String)) */\n@property (nonatomic, strong) NSArray <NSString *> *\(key);\n")
                 }
                 else if (firstObject is [String:Any]) {
                     // Dictionary 类型
@@ -261,14 +263,14 @@ class SKCodeBuilder: NSObject {
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
                     self.yymodelPropertyGenericClassDicts.setValue(modeName, forKey: key)
-                    hString.append("/** \(commentName(key, key)) */\n@property (nonatomic, strong) NSArray <\(modeName) *> *\(key);\n")
+                    hString.append("/** eg. \(commentName(key, "")) */\n@property (nonatomic, strong) NSArray <\(modeName) *> *\(key);\n")
                 }
                 else if (firstObject is [Any]) {
                     // Array 类型
                     handleArrayValue(arrayValue: firstObject as! [Any] , key: key, hString: hString)
                 }
                 else {
-                    hString.append("/** \(commentName(key, key)) */\n@property (nonatomic, strong) NSArray *\(key);\n")
+                    hString.append("/** eg. \(commentName(key, "")) */\n@property (nonatomic, strong) NSArray *\(key);\n")
                 }
             }
         } else if config.codeType == .Swift {
@@ -282,23 +284,21 @@ class SKCodeBuilder: NSObject {
                     let key = handleMaybeSameKey(key)
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
-                    hString.append("    ///  \(commentName(key, key, false)) \n    var \(key): [\(modeName)]?\n")
+                    hString.append("    ///  \(commentName(key, "", false)) \n    var \(key): [\(modeName)]?\n")
                 }
                 else if (firstObject is [Any]) {
                     // Array 类型
                     handleArrayValue(arrayValue: firstObject as! [Any] , key: key, hString: hString)
                 }
                 else {
-                    hString.append("    /// \(commentName(key, key, false)) \n    var \(key): [Any]?\n")
+                    hString.append("    /// \(commentName(key, "", false)) \n    var \(key): [Any]?\n")
                 }
             }
         }
     }
     
     private func handleIdNumberValue(numValue:NSNumber, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
-        
-        // let type = numValue.objCType
-        
+                
         let numType = CFNumberGetType(numValue as CFNumber)
         
         switch numType {
@@ -353,7 +353,6 @@ class SKCodeBuilder: NSObject {
     }
 
     /// String
-    
     private func handleIdStringValue(idValue: String, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
          
         if config.codeType == .OC {
@@ -378,9 +377,7 @@ class SKCodeBuilder: NSObject {
         }
     }
     
-    
-     /// 处理json解析
-
+    /// 处理json解析
     private func handleJsonType(hString:NSMutableString, mString:NSMutableString) {
         
         if config.jsonType == .HandyJSON {

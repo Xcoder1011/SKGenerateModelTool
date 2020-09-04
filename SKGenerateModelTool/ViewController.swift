@@ -11,9 +11,9 @@ import Cocoa
 class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     @IBOutlet weak var urlTF: NSTextField!
-    @IBOutlet weak var jsonTextView: NSTextView!
-    @IBOutlet weak var hTextView: NSTextView!
-    @IBOutlet weak var mTextView: NSTextView!
+    @IBOutlet var jsonTextView: NSTextView!
+    @IBOutlet var hTextView: NSTextView!
+    @IBOutlet var mTextView: NSTextView!
     @IBOutlet weak var hTextViewHeightPriority: NSLayoutConstraint!
     @IBOutlet weak var superClassNameTF: NSTextField!  /// default 3:5
     @IBOutlet weak var modelNamePrefixTF: NSTextField!
@@ -128,13 +128,9 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                 if line.contains("//") {
                     let substrings = line.components(separatedBy: "//")
                     let hasHttpLink = line.contains("http://") || line.contains("https://")
-                   
                     // 只有图片链接 且没注释的情况下 不做截断操作
                     let cannComment = !(substrings.count == 2 && hasHttpLink)
-                    guard cannComment else {
-                        return
-                    }
-                   
+                    guard cannComment else { return }
                     let trimmedLineStr = line.trimmingCharacters(in: .whitespacesAndNewlines)
                     let position = trimmedLineStr.postionOf(sub: "//",backwards: true)
                     if position >= 0 {
@@ -146,9 +142,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                             keystr = lines.first ?? ""
                             keystr = keystr.replacingOccurrences(of: "\"", with: "")
                             keystr = keystr.trimmingCharacters(in: .whitespacesAndNewlines)
-                            print("keystr = \(lines.first ?? "")")
-                            print("commentstr = \(commentstr)")
-                            commentDicts.updateValue(String(commentstr), forKey: keystr)
+                            let comment = String(commentstr).replacingOccurrences(of: "//", with: "")
+                            commentDicts.updateValue(comment, forKey: keystr)
                         }
                         let range = attriStr.range(of: String(commentstr))
                         attriStr.replaceCharacters(in: range, with: "")
@@ -156,8 +151,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                 }
             }
             
-            print("commentDicts = \(commentDicts)")
-
             let jsonStr = attriStr
             guard let jsonData = jsonStr.data(using: String.Encoding.utf8.rawValue) else {
                 showAlertInfoWith("warn: input valid json string!", .warning)
