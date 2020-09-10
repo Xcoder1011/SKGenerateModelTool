@@ -65,8 +65,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         loadUserLastInputContent()
     }
         
-    // MARK: - IBAction
-
     /// GET / POST request URL
 
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
