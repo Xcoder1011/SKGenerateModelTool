@@ -52,7 +52,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         reqTypeBtn.selectItem(at: 0)
         
         codeTypeBtn.removeAllItems()
-        codeTypeBtn.addItems(withTitles: ["Objective-C","Swift"])
+        codeTypeBtn.addItems(withTitles: ["Objective-C","Swift","Dart"])
         codeTypeBtn.selectItem(at: 0)
 
         jsonTypeBtn.removeAllItems()
@@ -125,7 +125,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             attriStr.enumerateLines { (line, _) in
                 if line.contains("//") {
                     let substrings = line.components(separatedBy: "//")
-                    let hasHttpLink = line.contains("http://") || line.contains("https://")
+                    let hasHttpLink = line.contains("http://") || line.contains("https://") || line.contains("tel://")
                     // 只有图片链接 且没注释的情况下 不做截断操作
                     let cannComment = !(substrings.count == 2 && hasHttpLink)
                     guard cannComment else { return }
@@ -190,6 +190,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
         } else if builder.config.codeType == .Swift {
             multiplier = 1.0
+        } else if builder.config.codeType == .Dart {
+            configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
         }
         hTextViewHeightPriority = modifyConstraint(hTextViewHeightPriority, multiplier)
         configJsonTextView(text: hString as String, textView: hTextView, color: codeTextColor)
@@ -311,11 +313,18 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     /// save cache
     
     private func saveUserInputContent() {
+      
+        builder.config.codeType = SKCodeBuilderCodeType(rawValue: codeTypeBtn.indexOfSelectedItem + 1) ?? .OC
         
-        let superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
+        var superClassName = ""
+        if builder.config.codeType == .Dart {
+            superClassName = superClassNameTF.stringValue
+        } else {
+            superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
+        }
         UserDefaults.standard.setValue(superClassName, forKey: SuperClassNameCacheKey)
         builder.config.superClassName = superClassName
-        
+
         let modelNamePrefix = modelNamePrefixTF.stringValue.isBlank ? "NS" : modelNamePrefixTF.stringValue
         UserDefaults.standard.setValue(modelNamePrefix, forKey: ModelNamePrefixCacheKey)
         builder.config.modelNamePrefix = modelNamePrefix
@@ -346,8 +355,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     override var representedObject: Any? {
-        didSet {
-        }
+        didSet { }
     }
 }
 
