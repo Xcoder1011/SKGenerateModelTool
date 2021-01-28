@@ -39,7 +39,7 @@ class SKCodeBuilder: NSObject {
     lazy var fromJsonString = NSMutableString()
     lazy var toJsonString = NSMutableString()
 
-    var fileTye:String {
+    var fileType:String {
         get {
             if config.codeType == .Swift { return "swift" }
             else if config.codeType == .Dart { return "dart" }
@@ -56,6 +56,8 @@ class SKCodeBuilder: NSObject {
         toJsonString = ""
         let hString = NSMutableString()
         let mString = NSMutableString()
+        let fileName = (config.codeType == .Dart) ? config.rootModelName.underscore_name : config.rootModelName
+        
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
         if config.codeType == .OC {
             if config.superClassName == "NSObject" {
@@ -69,10 +71,9 @@ class SKCodeBuilder: NSObject {
                 hString.insert("\nimport HandyJSON\n\n", at: 0)
             }
         } else if config.codeType == .Dart {
-            hString.insert("\npart '\(config.rootModelName).m.dart';\n\n", at: 0)
-            mString.insert("\npart of '\(config.rootModelName).dart';\n\n", at: 0)
+            hString.insert("\npart '\(fileName).m.dart';\n\n", at: 0)
+            mString.insert("\npart of '\(fileName).dart';\n\n", at: 0)
         }
-        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         let time = dateFormatter.string(from: Date())
@@ -81,7 +82,7 @@ class SKCodeBuilder: NSObject {
         let hCommentString =
         """
         //
-        //  \(config.rootModelName).\(fileTye)
+        //  \(fileName).\(fileType)
         //  SKGenerateModelTool
         //
         //  Created by \(config.authorName) on \(time).
@@ -89,14 +90,14 @@ class SKCodeBuilder: NSObject {
         //\n
         """
         
-        var fileName = "m"
+        var fileSuffixName = "m"
         if config.codeType == .Dart {
-            fileName = "m.dart"
+            fileSuffixName = "m.dart"
         }
         let mCommentString =
         """
         //
-        //  \(config.rootModelName).\(fileName)
+        //  \(fileName).\(fileSuffixName)
         //  SKGenerateModelTool
         //
         //  Created by \(config.authorName) on \(time).
@@ -113,7 +114,6 @@ class SKCodeBuilder: NSObject {
     
     func generateFile(with filePath:String?, hString:NSMutableString, mString:NSMutableString, complete:GenerateFileComplete?) {
         if hString.length > 0 && mString.length > 0 {
-            
             var filePath = filePath
             var success = false
             if filePath == nil {
@@ -135,17 +135,17 @@ class SKCodeBuilder: NSObject {
                     }
                 }
             }
-            
+            let fileName = (config.codeType == .Dart) ? config.rootModelName.underscore_name : config.rootModelName
             var fileNameH = "", fileNameM = ""
             if let filePath = filePath {
                 if config.codeType == .OC {
-                    fileNameH = filePath.appending("/\(config.rootModelName).h")
-                    fileNameM = filePath.appending("/\(config.rootModelName).m")
+                    fileNameH = filePath.appending("/\(fileName).h")
+                    fileNameM = filePath.appending("/\(fileName).m")
                 } else if config.codeType == .Swift {
-                    fileNameH = filePath.appending("/\(config.rootModelName).swift")
+                    fileNameH = filePath.appending("/\(fileName).swift")
                 } else if config.codeType == .Dart {
-                    fileNameH = filePath.appending("/\(config.rootModelName).dart")
-                    fileNameM = filePath.appending("/\(config.rootModelName).m.dart")
+                    fileNameH = filePath.appending("/\(fileName).dart")
+                    fileNameM = filePath.appending("/\(fileName).m.dart")
                 }
                 do {
                     if !fileNameH.isBlank {
@@ -194,7 +194,6 @@ class SKCodeBuilder: NSObject {
                 } else {
                     hString.append("\nclass \(config.rootModelName) extends \(config.superClassName) {\n\n")
                 }
-                
             } else { // sub model
                 modelName = modelClassName(with: key)
                 if config.superClassName.isBlank {
@@ -240,7 +239,6 @@ class SKCodeBuilder: NSObject {
                     } else if config.codeType == .Dart {
                         hString.append("    \(modelName) \(key);\n")
                         self.yymodelPropertyGenericClassDicts.setValue(modelName, forKey: key)
-                        
                         let fString =
                         """
                             if (json['\(key)'] != null) {
@@ -249,7 +247,6 @@ class SKCodeBuilder: NSObject {
                         
                         """
                         fromJsonString.append(fString)
-                        
                         let tString =
                         """
                             if (instance.\(key) != null) {
@@ -273,7 +270,6 @@ class SKCodeBuilder: NSObject {
                         hString.append("    /// <#泛型#>\n    var \(key): Any?\n")
                     } else if config.codeType == .Dart {
                         hString.append("    dynamic \(key);  //<#泛型#>\n")
-                        
                         let fString =
                         """
                             if (json['\(key)'] != null) {
@@ -282,7 +278,6 @@ class SKCodeBuilder: NSObject {
                         
                         """
                         fromJsonString.append(fString)
-                        
                         let tString =
                         """
                             if (instance.\(key) != null) {
@@ -290,7 +285,6 @@ class SKCodeBuilder: NSObject {
                             }
                         
                         """
-                        
                         toJsonString.append(tString)
                     }
                 }
@@ -319,15 +313,18 @@ class SKCodeBuilder: NSObject {
             if !key.isBlank {
                 modelName = modelClassName(with: key)
             }
-            let fromJsonString =
+            let headerString =
             """
             
                 \(modelName) fromJson(Map<String, dynamic> json) => _$\(modelName)FromJson(json, this);
                 Map<String, dynamic> toJson() => _$\(modelName)ToJson(this);
             
             """
-            hString.append(fromJsonString);
+            hString.append(headerString);
             hString.append("}\n")
+            
+            fromJsonString.append("    return instance;\n");
+            toJsonString.append("    return json;\n");
         }
         if !key.isBlank {
             self.handleDicts.removeObject(forKey: key)
@@ -415,7 +412,6 @@ class SKCodeBuilder: NSObject {
                     
                     """
                     fromJsonString.append(fString)
-                                        
                     let tString =
                     """
                         if (instance.\(key) != null) {
@@ -432,7 +428,6 @@ class SKCodeBuilder: NSObject {
                     self.handleDicts.setValue(firstObject, forKey: key)
                     self.yymodelPropertyGenericClassDicts.setValue(modeName, forKey: key)
                     hString.append("    List<\(modeName)> \(key);  \(singlelineCommentName(key, "", false))\n")
-                    
                     let fString =
                     """
                         if (json['\(key)'] != null) {
@@ -852,6 +847,36 @@ extension String {
             return "_\(adler ^ crc)"
         }
         return self
+    }
+    
+    /// 驼峰转下划线
+    var underscore_name: String {
+        var name = ""
+        if self.isBlank { return "" }
+        var upperword = ""
+        var _canAdd = false
+        self.forEach { (character) in
+            if character.isUppercase { // 大写
+                if _canAdd {
+                    name.append("_\(character.lowercased())")
+                } else {
+                    name.append("\(character.lowercased())")
+                    upperword.append(character)
+                }
+            } else { // 小写
+                if !name.contains("_"){
+                    if upperword.count > 1 {
+                        let frontString = (name as NSString).substring(to: upperword.count-1)
+                        let lastString = (name as NSString).substring(from: upperword.count-1)
+                        name.removeAll()
+                        name.append("\(frontString)_\(lastString)")
+                    }
+                }
+                name.append(character)
+                _canAdd = true
+            }
+        }
+        return name
     }
 }
 

@@ -117,9 +117,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
        
         if let jsonString = jsonTextView.textStorage?.string {
             if jsonString.isBlank { return }
-            var trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
-            trimmedStr = trimmedStr .replacingOccurrences(of: "”", with: "\"")
-            trimmedStr = trimmedStr .replacingOccurrences(of: "，", with: ",")
+            let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
             let attriStr = NSMutableString(string: trimmedStr)
             var commentDicts:[String:String] = [:]
             attriStr.enumerateLines { (line, _) in
