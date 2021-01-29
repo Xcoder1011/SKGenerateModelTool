@@ -33,12 +33,16 @@ class SKCodeBuilder: NSObject {
     lazy var yymodelPropertyGenericClassDicts = NSMutableDictionary()
     lazy var handlePropertyMapper = NSMutableDictionary()
     lazy var allKeys = [String]()
+    lazy var blankSpace = "   ";
+    lazy var blankSpace2 = "  ";
+
     // 适配json文件的注释
     var commentDicts:[String:String]?
+    
     // Dart => FromJson & ToJson
     lazy var fromJsonString = NSMutableString()
     lazy var toJsonString = NSMutableString()
-
+    
     var fileType:String {
         get {
             if config.codeType == .Swift { return "swift" }
@@ -72,7 +76,7 @@ class SKCodeBuilder: NSObject {
             }
         } else if config.codeType == .Dart {
             hString.insert("\npart '\(fileName).m.dart';\n\n", at: 0)
-            mString.insert("\npart of '\(fileName).dart';\n\n", at: 0)
+            mString.insert("\npart of '\(fileName).dart';\n", at: 0)
         }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
@@ -190,21 +194,21 @@ class SKCodeBuilder: NSObject {
             var modelName = config.rootModelName
             if key.isBlank { // Root model
                 if config.superClassName.isBlank {
-                    hString.append("\nclass \(config.rootModelName) {\n\n")
+                    hString.append("class \(config.rootModelName) {\n")
                 } else {
-                    hString.append("\nclass \(config.rootModelName) extends \(config.superClassName) {\n\n")
+                    hString.append("class \(config.rootModelName) extends \(config.superClassName) {\n")
                 }
             } else { // sub model
                 modelName = modelClassName(with: key)
                 if config.superClassName.isBlank {
-                    hString.append("\nclass \(modelName) {\n\n")
+                    hString.append("\nclass \(modelName) {\n")
                 } else {
-                    hString.append("\nclass \(modelName) extends \(config.superClassName) {\n\n")
+                    hString.append("\nclass \(modelName) extends \(config.superClassName) {\n")
                 }
             }
             fromJsonString.append("\n\(modelName) _$\(modelName)FromJson(Map<String, dynamic> json, \(modelName) instance) {\n")
             toJsonString.append("\nMap<String, dynamic> _$\(modelName)ToJson(\(modelName) instance) {\n")
-            toJsonString.append("    final Map<String, dynamic> json = new Map<String, dynamic>();\n")
+            toJsonString.append("   final Map<String, dynamic> json = new Map<String, dynamic>();\n")
         }
         
         switch dictValue {
@@ -237,21 +241,21 @@ class SKCodeBuilder: NSObject {
                     } else if config.codeType == .Swift {
                         hString.append("    /// \n    var \(key): \(modelName)?\n")
                     } else if config.codeType == .Dart {
-                        hString.append("    \(modelName) \(key);\n")
+                        hString.append("   \(modelName) \(key);\n")
                         self.yymodelPropertyGenericClassDicts.setValue(modelName, forKey: key)
                         let fString =
                         """
-                            if (json['\(key)'] != null) {
-                                instance.\(key) = new \(modelName)().fromJson(json['\(key)']);
-                            }
+                        \(blankSpace)if(json['\(key)'] != null) {
+                        \(blankSpace)\(blankSpace2)instance.\(key) = new \(modelName)().fromJson(json['\(key)']);
+                        \(blankSpace)}
                         
                         """
                         fromJsonString.append(fString)
                         let tString =
                         """
-                            if (instance.\(key) != null) {
-                                json['\(key)'] = instance.\(key).toJson();
-                            }
+                        \(blankSpace)if(instance.\(key) != null) {
+                        \(blankSpace)\(blankSpace2)json['\(key)'] = instance.\(key).toJson();
+                        \(blankSpace)}
                         
                         """
                         toJsonString.append(tString)
@@ -269,20 +273,20 @@ class SKCodeBuilder: NSObject {
                     } else if config.codeType == .Swift {
                         hString.append("    /// <#泛型#>\n    var \(key): Any?\n")
                     } else if config.codeType == .Dart {
-                        hString.append("    dynamic \(key);  //<#泛型#>\n")
+                        hString.append("   dynamic \(key);  //<#泛型#>\n")
                         let fString =
                         """
-                            if (json['\(key)'] != null) {
-                                instance.\(key) = json['\(key)'];
-                            }
+                        \(blankSpace)if(json['\(key)'] != null) {
+                        \(blankSpace)\(blankSpace2)instance.\(key) = json['\(key)'];
+                        \(blankSpace)}
                         
                         """
                         fromJsonString.append(fString)
                         let tString =
                         """
-                            if (instance.\(key) != null) {
-                                json['\(key)'] = instance.\(key);
-                            }
+                        \(blankSpace)if(instance.\(key) != null) {
+                        \(blankSpace)\(blankSpace2)json['\(key)'] = instance.\(key);
+                        \(blankSpace)}
                         
                         """
                         toJsonString.append(tString)
@@ -316,15 +320,15 @@ class SKCodeBuilder: NSObject {
             let headerString =
             """
             
-                \(modelName) fromJson(Map<String, dynamic> json) => _$\(modelName)FromJson(json, this);
-                Map<String, dynamic> toJson() => _$\(modelName)ToJson(this);
+            \(blankSpace)\(modelName) fromJson(Map<String, dynamic> json) => _$\(modelName)FromJson(json, this);
+            \(blankSpace)Map<String, dynamic> toJson() => _$\(modelName)ToJson(this);
             
             """
             hString.append(headerString);
             hString.append("}\n")
             
-            fromJsonString.append("    return instance;\n");
-            toJsonString.append("    return json;\n");
+            fromJsonString.append("   return instance;\n");
+            toJsonString.append("   return json;\n");
         }
         if !key.isBlank {
             self.handleDicts.removeObject(forKey: key)
@@ -401,22 +405,22 @@ class SKCodeBuilder: NSObject {
             if let firstObject = arrayValue.first  {
                 if firstObject is String {
                     // String 类型
-                    hString.append("    List<String> \(key);  \(singlelineCommentName(key, firstObject as! String, false))\n")
+                    hString.append("   List<String> \(key);  \(singlelineCommentName(key, firstObject as! String, false))\n")
                     
                     let fString =
                     """
-                        if (json['\(key)'] != null) {
-                            instance.\(key) = new List<String>();
-                            instance.\(key) = json['\(key)']?.map((v) => v?.toString())?.toList()?.cast<String>();
-                        }
+                    \(blankSpace)if(json['\(key)'] != null) {
+                    \(blankSpace)\(blankSpace2)instance.\(key) = new List<String>();
+                    \(blankSpace)\(blankSpace2)instance.\(key) = json['\(key)']?.map((v) => v?.toString())?.toList()?.cast<String>();
+                    \(blankSpace)}
                     
                     """
                     fromJsonString.append(fString)
                     let tString =
                     """
-                        if (instance.\(key) != null) {
-                            json['\(key)'] = instance.\(key);
-                        }
+                    \(blankSpace)if(instance.\(key) != null) {
+                    \(blankSpace)\(blankSpace2)json['\(key)'] = instance.\(key);
+                    \(blankSpace)}
                     
                     """
                     toJsonString.append(tString)
@@ -427,24 +431,24 @@ class SKCodeBuilder: NSObject {
                     let modeName = modelClassName(with: key)
                     self.handleDicts.setValue(firstObject, forKey: key)
                     self.yymodelPropertyGenericClassDicts.setValue(modeName, forKey: key)
-                    hString.append("    List<\(modeName)> \(key);  \(singlelineCommentName(key, "", false))\n")
+                    hString.append("   List<\(modeName)> \(key);  \(singlelineCommentName(key, "", false))\n")
                     let fString =
                     """
-                        if (json['\(key)'] != null) {
-                            instance.\(key) = new List<\(modeName)>();
-                            (json['\(key)'] as List).forEach((v) {
-                                instance.\(key).add(new \(modeName)().fromJson(v));
-                            });
-                        }
+                    \(blankSpace)if(json['\(key)'] != null) {
+                    \(blankSpace)\(blankSpace2)instance.\(key) = new List<\(modeName)>();
+                    \(blankSpace)\(blankSpace2)(json['\(key)'] as List).forEach((v) {
+                    \(blankSpace)\(blankSpace2)\(blankSpace2)instance.\(key).add(new \(modeName)().fromJson(v));
+                    \(blankSpace)\(blankSpace2)});
+                    \(blankSpace)}
                     
                     """
                     fromJsonString.append(fString)
-                                        
+                    
                     let tString =
                     """
-                        if (instance.\(key) != null) {
-                            json['\(key)'] = instance.\(key).map((v) => v.toJson()).toList();
-                        }
+                    \(blankSpace)if(instance.\(key) != null) {
+                    \(blankSpace)\(blankSpace2)json['\(key)'] = instance.\(key).map((v) => v.toJson()).toList();
+                    \(blankSpace)}
                     
                     """
                     toJsonString.append(tString)
@@ -459,19 +463,19 @@ class SKCodeBuilder: NSObject {
                     
                     let fString =
                     """
-                        if (json['\(key)'] != null) {
-                            instance.\(key) = new List<dynamic>();
-                            instance.\(key).addAll(json['\(key)']);
-                        }
+                    \(blankSpace)if(json['\(key)'] != null) {
+                    \(blankSpace)\(blankSpace2)instance.\(key) = new List<dynamic>();
+                    \(blankSpace)\(blankSpace2)instance.\(key).addAll(json['\(key)']);
+                    \(blankSpace)}
                     
                     """
                     fromJsonString.append(fString)
-                                        
+                    
                     let tString =
                     """
-                        if (instance.\(key) != null) {
-                            json['\(key)'] = [];
-                        }
+                    \(blankSpace)if(instance.\(key) != null) {
+                    \(blankSpace)\(blankSpace2)json['\(key)'] = [];
+                    \(blankSpace)}
                     
                     """
                     toJsonString.append(tString)
@@ -481,7 +485,7 @@ class SKCodeBuilder: NSObject {
     }
     
     private func handleIdNumberValue(numValue:NSNumber, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
-                
+        
         let numType = CFNumberGetType(numValue as CFNumber)
         
         switch numType {
@@ -493,17 +497,23 @@ class SKCodeBuilder: NSObject {
             } else if config.codeType == .Swift {
                 hString.append("    /// \(commentName(key, "\(numValue)"))\n    var \(key): Double?\n")
             } else if config.codeType == .Dart {
-                hString.append("    double \(key);  \(singlelineCommentName(key, "\(numValue)"))\n")
+                hString.append("   double \(key);  \(singlelineCommentName(key, "\(numValue)"))\n")
+                
                 let fString =
                 """
-                    if (json['\(key)'] != null) {
-                      instance.\(key) = json['\(key)']?.toDouble();
-                    }
+                \(blankSpace)if(json['\(key)'] != null) {
+                \(blankSpace)\(blankSpace2)final \(key) = json['\(key)'];
+                \(blankSpace)\(blankSpace2)if(\(key) is String) {
+                \(blankSpace)\(blankSpace2)\(blankSpace2)instance.\(key) = double.parse(\(key));
+                \(blankSpace)\(blankSpace2)} else {
+                \(blankSpace)\(blankSpace2)\(blankSpace2)instance.\(key) = \(key)?.toDouble();
+                \(blankSpace)\(blankSpace2)}
+                \(blankSpace)}
                 
                 """
                 fromJsonString.append(fString)
                 
-                let tString = "    json['\(key)'] = instance.\(key);\n"
+                let tString = "   json['\(key)'] = instance.\(key);\n"
                 toJsonString.append(tString)
             }
             
@@ -515,17 +525,17 @@ class SKCodeBuilder: NSObject {
                 } else if config.codeType == .Swift {
                     hString.append("    /// \(commentName(key, (numValue.boolValue == true ? "true" : "false")))\n    var \(key): Bool = false\n")
                 } else if config.codeType == .Dart {
-                    hString.append("    bool \(key);  \(singlelineCommentName(key, (numValue.boolValue == true ? "true" : "false")))\n")
+                    hString.append("   bool \(key);  \(singlelineCommentName(key, (numValue.boolValue == true ? "true" : "false")))\n")
                     let fString =
                     """
-                        if (json['\(key)'] != null) {
-                          instance.\(key) = json['\(key)'];
-                        }
+                    \(blankSpace)if(json['\(key)'] != null) {
+                    \(blankSpace)\(blankSpace2)instance.\(key) = json['\(key)'];
+                    \(blankSpace)}
                     
                     """
                     fromJsonString.append(fString)
                     
-                    let tString = "     json['\(key)'] = instance.\(key);\n"
+                    let tString = "    json['\(key)'] = instance.\(key);\n"
                     toJsonString.append(tString)
                 }
             } else {
@@ -561,24 +571,31 @@ class SKCodeBuilder: NSObject {
         }
         
         if config.codeType == .Dart {
-            hString.append("    int \(key);  \(singlelineCommentName(key, "\(intValue)"))\n")
+            hString.append("   int \(key);  \(singlelineCommentName(key, "\(intValue)"))\n")
+            
             let fString =
             """
-                if (json['\(key)'] != null) {
-                  instance.\(key) = json['\(key)']?.toInt();
-                }
+            \(blankSpace)if(json['\(key)'] != null) {
+            \(blankSpace)\(blankSpace2)final \(key) = json['\(key)'];
+            \(blankSpace)\(blankSpace2)if(\(key) is String) {
+            \(blankSpace)\(blankSpace2)\(blankSpace2)instance.\(key) = int.parse(\(key));
+            \(blankSpace)\(blankSpace2)} else {
+            \(blankSpace)\(blankSpace2)\(blankSpace2)instance.\(key) = \(key)?.toInt();
+            \(blankSpace)\(blankSpace2)}
+            \(blankSpace)}
             
             """
+            
             fromJsonString.append(fString)
             
-            let tString = "     json['\(key)'] = instance.\(key);\n"
+            let tString = "    json['\(key)'] = instance.\(key);\n"
             toJsonString.append(tString)
         }
     }
     
     /// String
     private func handleIdStringValue(idValue: String, key:String, hString:NSMutableString, ignoreIdValue:Bool) {
-         
+        
         if config.codeType == .OC {
             if key == "id" && !ignoreIdValue {
                 // 字符串id 替换成 itemId
@@ -601,24 +618,24 @@ class SKCodeBuilder: NSObject {
         } else if config.codeType == .Dart {
             if key == "id" && !ignoreIdValue {
                 self.handlePropertyMapper.setValue("id", forKey: "itemId")
-                hString.append("    String \(key);  \(singlelineCommentName(key, idValue))\n")
+                hString.append("   String \(key);  \(singlelineCommentName(key, idValue))\n")
             } else {
                 if idValue.count > 12 {
-                    hString.append("    String \(key);  \(singlelineCommentName(key, idValue, false))\n")
+                    hString.append("   String \(key);  \(singlelineCommentName(key, idValue, false))\n")
                 } else {
-                    hString.append("    String \(key);  \(singlelineCommentName(key, idValue))\n")
+                    hString.append("   String \(key);  \(singlelineCommentName(key, idValue))\n")
                 }
             }
             let fString =
             """
-               if (json['\(key)'] != null) {
-                 instance.\(key) = json['\(key)']?.toString();
-               }
+            \(blankSpace)if(json['\(key)'] != null) {
+            \(blankSpace)\(blankSpace2)instance.\(key) = json['\(key)']?.toString();
+            \(blankSpace)}
             
             """
             fromJsonString.append(fString)
             
-            let tString = "     json['\(key)'] = instance.\(key);\n"
+            let tString = "   json['\(key)'] = instance.\(key);\n"
             toJsonString.append(tString)
         }
     }
