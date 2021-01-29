@@ -10,6 +10,8 @@
 - 兼容YYModel / MJExtension / HandyJSON解析
 - 兼容服务端返回“id”字段
 - 类驼峰命名
+- Flutter Model解析兼容了服务端返回string/int/double时数据类型混用的情况
+
 
 - Support OC / Swift / Dart
 - Supports one-click generation of model files through URL links or json strings
@@ -19,6 +21,7 @@
 - Compatible with YYModel / MJExtension analysis
 - Compatible server returns "id" field
 - Supports hump naming
+- Flutter model parsing is compatible with mixed data types when the server returns string / int / double
 
 ###### 生成Flutter Dart Model
 
@@ -188,4 +191,7 @@ const SKEncryptString * const _3908173925 = &(SKEncryptString){
 ![encrypt_result](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/encrypt_result.png)
 
 Tip：本工具仅用到简单的XOR加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的dmg文件进行安装使用。
+
+- 简书地址：[https://www.jianshu.com/p/a2ee31a04252](https://www.jianshu.com/p/a2ee31a04252)
+
 
