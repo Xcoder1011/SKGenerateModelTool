@@ -1,26 +1,127 @@
 # SKGenerateModelTool
 
+# SKGenerateModelTool
+
 
 ![SKGenerateModelTool](https://upload-images.jianshu.io/upload_images/1129777-9c130b4ce345ddf9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+- 支持Objective-C / Swift / Dart
 - 支持通过URL链接或json字符串一键生成model文件
 - 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
 - 支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名
-- 支持OC / Swift 
 - 支持自定义输出文件夹路径
 - 兼容YYModel / MJExtension / HandyJSON解析
 - 兼容服务端返回“id”字段
-- 支持类驼峰命名
+- 类驼峰命名
 
+- Support OC / Swift / Dart
 - Supports one-click generation of model files through URL links or json strings
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
 - Support custom model parent class, custom model prefix, custom file name, custom author name
-- Support OC / Swift
 - Support custom output folder path
 - Compatible with YYModel / MJExtension analysis
 - Compatible server returns "id" field
 - Supports hump naming
 
+###### 生成Flutter Dart Model
+
+```
+//
+//  news_response.dart
+//  SKGenerateModelTool
+//
+//  Created by wushangkun on 2021/01/29.
+//  Copyright © 2021 SKGenerateModelTool. All rights reserved.
+//
+
+part 'news_response.m.dart';
+
+class NewsResponse extends NSObject {
+   List<SKDataModel> data;  
+   String msg;  // success
+   int code;  // 200
+
+   NewsResponse fromJson(Map<String, dynamic> json) => _$NewsResponseFromJson(json, this);
+   Map<String, dynamic> toJson() => _$NewsResponseToJson(this);
+}
+
+class SKDataModel extends NSObject {
+   String title;  
+   String source;  // 环球网资讯
+   String imgsrc;  
+
+   SKDataModel fromJson(Map<String, dynamic> json) => _$SKDataModelFromJson(json, this);
+   Map<String, dynamic> toJson() => _$SKDataModelToJson(this);
+}
+
+```
+
+实现文件
+
+```
+//
+//  news_response.m.dart
+//  SKGenerateModelTool
+//
+//  Created by wushangkun on 2021/01/29.
+//  Copyright © 2021 SKGenerateModelTool. All rights reserved.
+//
+
+part of 'news_response.dart';
+
+NewsResponse _$NewsResponseFromJson(Map<String, dynamic> json, NewsResponse instance) {
+   if(json['data'] != null) {
+     instance.data = new List<SKDataModel>();
+     (json['data'] as List).forEach((v) {
+       instance.data.add(new SKDataModel().fromJson(v));
+     });
+   }
+   if(json['msg'] != null) {
+     instance.msg = json['msg']?.toString();
+   }
+   if(json['code'] != null) {
+     final code = json['code'];
+     if(code is String) {
+       instance.code = int.parse(code);
+     } else {
+       instance.code = code?.toInt();
+     }
+   }
+   return instance;
+}
+
+Map<String, dynamic> _$NewsResponseToJson(NewsResponse instance) {
+   final Map<String, dynamic> json = new Map<String, dynamic>();
+   if(instance.data != null) {
+     json['data'] = instance.data.map((v) => v.toJson()).toList();
+   }
+   json['msg'] = instance.msg;
+    json['code'] = instance.code;
+   return json;
+}
+
+SKDataModel _$SKDataModelFromJson(Map<String, dynamic> json, SKDataModel instance) {
+   if(json['title'] != null) {
+     instance.title = json['title']?.toString();
+   }
+   if(json['source'] != null) {
+     instance.source = json['source']?.toString();
+   }
+   if(json['imgsrc'] != null) {
+     instance.imgsrc = json['imgsrc']?.toString();
+   }
+   return instance;
+}
+
+Map<String, dynamic> _$SKDataModelToJson(SKDataModel instance) {
+   final Map<String, dynamic> json = new Map<String, dynamic>();
+   json['title'] = instance.title;
+   json['source'] = instance.source;
+   json['imgsrc'] = instance.imgsrc;
+   return json;
+}
+
+```
 
 ###### 生成Model
 ![生成Model](https://upload-images.jianshu.io/upload_images/1129777-51a3b41012e11c96.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
