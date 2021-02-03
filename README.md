@@ -1,6 +1,6 @@
 # SKGenerateModelTool
 
-![SKGenerateModelTool](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/home.png)
+![SKGenerateModelTool](../images/home.png)
 
 - 支持Objective-C / Swift / Dart
 - 支持通过URL链接或json字符串一键生成model文件
@@ -36,7 +36,7 @@
 
 part 'news_response.m.dart';
 
-class NewsResponse extends NSObject {
+class NewsResponse {
    List<SKDataModel> data;  
    String msg;  // success
    int code;  // 200
@@ -45,7 +45,7 @@ class NewsResponse extends NSObject {
    Map<String, dynamic> toJson() => _$NewsResponseToJson(this);
 }
 
-class SKDataModel extends NSObject {
+class SKDataModel {
    String title;  
    String source;  // 环球网资讯
    String imgsrc;  
@@ -124,17 +124,17 @@ Map<String, dynamic> _$SKDataModelToJson(SKDataModel instance) {
 ```
 
 ###### Flutter Model header
-![header](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/flutter1.png)
+![header](../images/flutter1.png)
 
 ###### 字符串加密示例
-![字符串加密示例](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/encrypt.png)
+![字符串加密示例](../images/encrypt.png)
 
 加密后的内容添加到项目中（声明和定义可以分别放.h和.m），因为代码依赖SKEncryptString结构体，所以需要导入头文件**SKEncryptHeader.h**引用。
 
 > 只需把此头文件（SKEncryptHeader.h）加入到项目，并在pch文件中导入该头文件即可使用;
 Just add this header file (SKEncryptHeader.h) to the project and import the header file in the pch file to use;
 
-![SKEncryptHeader.h](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/SKEncryptHeader.png)
+![SKEncryptHeader.h](../images/SKEncryptHeader.png)
 
 加密后的数据申明：
 
@@ -188,7 +188,7 @@ const SKEncryptString * const _3908173925 = &(SKEncryptString){
         }
 ```
 
-![encrypt_result](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/images/encrypt_result.png)
+![encrypt_result](../images/encrypt_result.png)
 
 Tip：本工具仅用到简单的XOR加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的dmg文件进行安装使用。
 
