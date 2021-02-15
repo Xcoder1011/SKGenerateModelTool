@@ -1,6 +1,6 @@
 # SKGenerateModelTool
 
-![SKGenerateModelTool](../images/home.png)
+[![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg)  ![](https://img.shields.io/badge/Dart-flutter-blue) ![](https://img.shields.io/badge/Swift-91.7%25-brightgreen) ![](https://img.shields.io/badge/license-MIT-green)
 
 - 支持Objective-C / Swift / Dart
 - 支持通过URL链接或json字符串一键生成model文件
@@ -12,7 +12,6 @@
 - 类驼峰命名
 - Flutter Model解析兼容了服务端返回string/int/double时数据类型混用的情况
 
-
 - Support OC / Swift / Dart
 - Supports one-click generation of model files through URL links or json strings
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
@@ -22,6 +21,9 @@
 - Compatible server returns "id" field
 - Supports hump naming
 - Flutter model parsing is compatible with mixed data types when the server returns string / int / double
+
+![SKGenerateModelTool](../master/images/home.png)
+
 
 ###### 生成Flutter Dart Model
 
@@ -124,17 +126,17 @@ Map<String, dynamic> _$SKDataModelToJson(SKDataModel instance) {
 ```
 
 ###### Flutter Model header
-![header](../images/flutter1.png)
+![header](../master/images/flutter1.png)
 
 ###### 字符串加密示例
-![字符串加密示例](../images/encrypt.png)
+![字符串加密示例](../master/images/encrypt.png)
 
 加密后的内容添加到项目中（声明和定义可以分别放.h和.m），因为代码依赖SKEncryptString结构体，所以需要导入头文件**SKEncryptHeader.h**引用。
 
 > 只需把此头文件（SKEncryptHeader.h）加入到项目，并在pch文件中导入该头文件即可使用;
 Just add this header file (SKEncryptHeader.h) to the project and import the header file in the pch file to use;
 
-![SKEncryptHeader.h](../images/SKEncryptHeader.png)
+![SKEncryptHeader.h](../master/images/SKEncryptHeader.png)
 
 加密后的数据申明：
 
@@ -188,7 +190,7 @@ const SKEncryptString * const _3908173925 = &(SKEncryptString){
         }
 ```
 
-![encrypt_result](../images/encrypt_result.png)
+![encrypt_result](../master/images/encrypt_result.png)
 
 Tip：本工具仅用到简单的XOR加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的dmg文件进行安装使用。
 
