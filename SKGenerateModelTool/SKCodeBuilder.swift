@@ -13,6 +13,7 @@ enum SKCodeBuilderCodeType: Int {
     case OC = 1
     case Swift
     case Dart
+    case TypeScript
     case Java
 }
 
@@ -47,6 +48,7 @@ class SKCodeBuilder: NSObject {
         get {
             if config.codeType == .Swift { return "swift" }
             else if config.codeType == .Dart { return "dart" }
+            else if config.codeType == .TypeScript { return "ts" }
             return "h"
         }
     }
@@ -61,7 +63,6 @@ class SKCodeBuilder: NSObject {
         let hString = NSMutableString()
         let mString = NSMutableString()
         let fileName = (config.codeType == .Dart) ? config.rootModelName.underscore_name : config.rootModelName
-        
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
         if config.codeType == .OC {
             if config.superClassName == "NSObject" {
@@ -97,6 +98,8 @@ class SKCodeBuilder: NSObject {
         var fileSuffixName = "m"
         if config.codeType == .Dart {
             fileSuffixName = "m.dart"
+        } else if config.codeType == .TypeScript {
+            fileSuffixName = "ts"
         }
         let mCommentString =
         """
@@ -108,7 +111,6 @@ class SKCodeBuilder: NSObject {
         //  Copyright © \(year) SKGenerateModelTool. All rights reserved.
         //\n
         """
-        
         hString.insert(hCommentString, at: 0)
         mString.insert(mCommentString, at: 0)
         if let handler = complete  {
@@ -150,6 +152,8 @@ class SKCodeBuilder: NSObject {
                 } else if config.codeType == .Dart {
                     fileNameH = filePath.appending("/\(fileName).dart")
                     fileNameM = filePath.appending("/\(fileName).m.dart")
+                } else if config.codeType == .TypeScript {
+                    fileNameH = filePath.appending("/\(fileName).ts")
                 }
                 do {
                     if !fileNameH.isBlank {
@@ -209,6 +213,13 @@ class SKCodeBuilder: NSObject {
             fromJsonString.append("\n\(modelName) _$\(modelName)FromJson(Map<String, dynamic> json, \(modelName) instance) {\n")
             toJsonString.append("\nMap<String, dynamic> _$\(modelName)ToJson(\(modelName) instance) {\n")
             toJsonString.append("   final Map<String, dynamic> json = new Map<String, dynamic>();\n")
+        } else if config.codeType == .TypeScript {
+            if key.isBlank { // Root model
+                hString.append("\nexport interface \(config.rootModelName) {\n")
+            } else { // sub model
+                let modelName = modelClassName(with: key)
+                hString.append("\n\nexport interface \(modelName) {\n")
+            }
         }
         
         switch dictValue {
@@ -259,6 +270,8 @@ class SKCodeBuilder: NSObject {
                         
                         """
                         toJsonString.append(tString)
+                    } else if config.codeType == .TypeScript {
+                        hString.append("   \(key): \(modelName);\n")
                     }
                     self.handleDicts.setValue(value, forKey: key)
                     
@@ -290,6 +303,8 @@ class SKCodeBuilder: NSObject {
                         
                         """
                         toJsonString.append(tString)
+                    } else if config.codeType == .TypeScript {
+                        hString.append("   \(key): null;\n")
                     }
                 }
             }
@@ -301,6 +316,8 @@ class SKCodeBuilder: NSObject {
             } else if config.codeType == .Swift {
                 hString.append("}\n")
             } else if config.codeType == .Dart {
+                hString.append("}\n")
+            } else if config.codeType == .TypeScript {
                 hString.append("}\n")
             }
             return
@@ -329,6 +346,9 @@ class SKCodeBuilder: NSObject {
             
             fromJsonString.append("   return instance;\n");
             toJsonString.append("   return json;\n");
+        } else if config.codeType == .TypeScript {
+            handleJsonType(hString: hString, mString: mString)
+            hString.append("}")
         }
         if !key.isBlank {
             self.handleDicts.removeObject(forKey: key)
@@ -481,6 +501,27 @@ class SKCodeBuilder: NSObject {
                     toJsonString.append(tString)
                 }
             }
+        } else if config.codeType == .TypeScript {
+            if let firstObject = arrayValue.first  {
+                if firstObject is String {
+                    // String 类型
+                    hString.append("   \(key)?: string[] | null;  \(singlelineCommentName(key, firstObject as! String, false))\n")
+                }
+                else if (firstObject is [String:Any]) {
+                    // Dictionary 类型
+                    let key = handleMaybeSameKey(key)
+                    let modeName = modelClassName(with: key)
+                    self.handleDicts.setValue(firstObject, forKey: key)
+                    hString.append("   \(key)?: (\(modeName))[] | null;  \(singlelineCommentName(key, "", false))\n")
+                }
+                else if (firstObject is [Any]) {
+                    // Array 类型
+                    handleArrayValue(arrayValue: firstObject as! [Any] , key: key, hString: hString)
+                }
+                else {
+                    hString.append("   \(key)?: (null))[] | null;  \(singlelineCommentName(key, "", false))\n")
+                }
+            }
         }
     }
     
@@ -515,6 +556,8 @@ class SKCodeBuilder: NSObject {
                 
                 let tString = "   json['\(key)'] = instance.\(key);\n"
                 toJsonString.append(tString)
+            } else if config.codeType == .TypeScript {
+                hString.append("   \(key): number;  \(singlelineCommentName(key, "\(numValue)"))\n")
             }
             
         case .charType:
@@ -537,6 +580,8 @@ class SKCodeBuilder: NSObject {
                     
                     let tString = "    json['\(key)'] = instance.\(key);\n"
                     toJsonString.append(tString)
+                } else if config.codeType == .TypeScript {
+                    hString.append("   \(key): boolean;  \(singlelineCommentName(key, (numValue.boolValue == true ? "true" : "false")))\n")
                 }
             } else {
                 handleIdStringValue(idValue: numValue.stringValue, key: key, hString: hString, ignoreIdValue: ignoreIdValue)
@@ -587,9 +632,10 @@ class SKCodeBuilder: NSObject {
             """
             
             fromJsonString.append(fString)
-            
             let tString = "    json['\(key)'] = instance.\(key);\n"
             toJsonString.append(tString)
+        } else if config.codeType == .TypeScript {
+            hString.append("   \(key): number;  \(singlelineCommentName(key, "\(intValue)"))\n")
         }
     }
     
@@ -637,6 +683,12 @@ class SKCodeBuilder: NSObject {
             
             let tString = "   json['\(key)'] = instance.\(key);\n"
             toJsonString.append(tString)
+        } else if config.codeType == .TypeScript {
+            if idValue.count > 12 {
+                hString.append("   \(key): string;  \(singlelineCommentName(key, idValue, false))\n")
+            } else {
+                hString.append("   \(key): string;  \(singlelineCommentName(key, idValue))\n")
+            }
         }
     }
     
@@ -670,7 +722,6 @@ class SKCodeBuilder: NSObject {
                 mString.append("\n}\n")
                 needLineBreak = true;
             }
-            
             /// 2.Custom property mapper.
             if (self.handlePropertyMapper.count > 0) {
                 if (needLineBreak) { mString.append("\n") }
@@ -696,7 +747,6 @@ class SKCodeBuilder: NSObject {
                 mString.append("\n}\n")
                 needLineBreak = true;
             }
-            
             if (self.handlePropertyMapper.count > 0) {
                 if (needLineBreak) { mString.append("\n") }
                 mString.append("+ (NSDictionary *)mj_replacedKeyFromPropertyName\n")

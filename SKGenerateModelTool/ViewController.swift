@@ -52,7 +52,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         reqTypeBtn.selectItem(at: 0)
         
         codeTypeBtn.removeAllItems()
-        codeTypeBtn.addItems(withTitles: ["Objective-C","Swift","Dart"])
+        codeTypeBtn.addItems(withTitles: ["Objective-C","Swift","Dart","TypeScript"])
         codeTypeBtn.selectItem(at: 0)
 
         jsonTypeBtn.removeAllItems()
@@ -123,7 +123,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             attriStr.enumerateLines { (line, _) in
                 if line.contains("//") {
                     let substrings = line.components(separatedBy: "//")
-                    let hasHttpLink = line.contains("http://") || line.contains("https://") || line.contains("tel://")
+                    let hasHttpLink = line.contains("http://") || line.contains("https://") || line.contains("://")
                     // 只有图片链接 且没注释的情况下 不做截断操作
                     let cannComment = !(substrings.count == 2 && hasHttpLink)
                     guard cannComment else { return }
@@ -186,7 +186,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         var multiplier:CGFloat = 3/5.0
         if builder.config.codeType == .OC {
             configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
-        } else if builder.config.codeType == .Swift {
+        } else if builder.config.codeType == .Swift || builder.config.codeType == .TypeScript  {
             multiplier = 1.0
         } else if builder.config.codeType == .Dart {
             configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
