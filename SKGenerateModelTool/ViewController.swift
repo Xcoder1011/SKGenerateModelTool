@@ -11,7 +11,7 @@ import Cocoa
 class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     @IBOutlet weak var urlTF: NSTextField!
-    @IBOutlet var jsonTextView: NSTextView!
+    @IBOutlet var jsonTextView: SKTextView!
     @IBOutlet var hTextView: NSTextView!
     @IBOutlet var mTextView: NSTextView!
     @IBOutlet weak var hTextViewHeightPriority: NSLayoutConstraint!
@@ -22,8 +22,9 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     @IBOutlet weak var reqTypeBtn: NSPopUpButton!
     @IBOutlet weak var codeTypeBtn: NSPopUpButton!
     @IBOutlet weak var jsonTypeBtn: NSPopUpButton!
-    @IBOutlet weak var generateFileBtn: NSButton!
-
+    @IBOutlet weak var generateFileBtn: NSButton!  // 生成文件
+    @IBOutlet weak var generateComment: NSButton!  // 生成注释
+    
     /// cache key
 
     let LastInputURLCacheKey = "LastInputURLCacheKey"
@@ -35,7 +36,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     let SupportJSONModelTypeCacheKey = "SupportJSONModelTypeCacheKey"
     let ShouldGenerateFileCacheKey = "ShouldGenerateFileCacheKey"
     let GenerateFilePathCacheKey = "GenerateFilePathCacheKey"
-    
+    let ShouldGenerateCommentCacheKey = "ShouldGenerateCommentCacheKey"
+
     var builder = SKCodeBuilder()
 
     var outputFilePath: String?
@@ -43,6 +45,30 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     lazy var jsonTextColor = NSColor.blue
     lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
+    
+    private lazy var jsonTextStorage: CodeAttributedString = {
+        let storage = CodeAttributedString()
+        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
+        storage.language = "json"
+        return storage
+    }()
+    
+    private lazy var hTextStorage: CodeAttributedString = {
+        let storage = CodeAttributedString()
+        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
+        storage.language = SKCodeBuilderCodeType.OC.language
+        return storage
+    }()
+    
+    private lazy var mTextStorage: CodeAttributedString = {
+        let storage = CodeAttributedString()
+        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
+        storage.language = SKCodeBuilderCodeType.OC.language
+        return storage
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,17 +84,22 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         jsonTypeBtn.removeAllItems()
         jsonTypeBtn.addItems(withTitles: ["None","YYModel","MJExtension","HandyJSON"])
         jsonTypeBtn.selectItem(at: 0)
+        
+        jsonTextStorage.addLayoutManager(jsonTextView.layoutManager!)
+        hTextStorage.addLayoutManager(hTextView.layoutManager!)
+        mTextStorage.addLayoutManager(mTextView.layoutManager!)
     }
     
     override func viewDidAppear() {
         super.viewDidAppear()
         loadUserLastInputContent()
+        updateCodeTheme()
     }
         
     /// GET / POST request URL
 
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
-       
+        updateCodeTheme()
         var urlString = urlTF.stringValue
         if urlString.isBlank { return }
         urlString = urlString.urlEncoding()
@@ -114,7 +145,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     /// start generate code....
     
     @IBAction func startMakeCode(_ sender: NSButton) {
-       
         if let jsonString = jsonTextView.textStorage?.string {
             if jsonString.isBlank { return }
             let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -158,6 +188,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                     showAlertInfoWith("warn: is not a valid JSON !!!", .warning)
                     return
                 }
+                saveUserInputContent()
+                updateCodeTheme()
                 if commentDicts.count > 0 {
                     configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
                     builder.commentDicts = commentDicts
@@ -168,9 +200,12 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                         configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
                     }
                 }
-                saveUserInputContent()
-                builder.generateCode(with: jsonObj) { [weak self] (hString, mString) in
-                    self?.handleGeneratedCode(hString, mString)
+                DispatchQueue.global().async {
+                    self.builder.generateCode(with: jsonObj) { [weak self] (hString, mString) in
+                        DispatchQueue.main.async {
+                            self?.handleGeneratedCode(hString, mString)
+                        }
+                    }
                 }
             } catch let error as NSError {
                 print(" error = \(error)")
@@ -181,8 +216,17 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         }
     }
     
+    private func updateCodeTheme() {
+        let theme = builder.config.codeType.theme
+        let language = builder.config.codeType.language
+        jsonTextStorage.highlightr.setTheme(to: theme)
+        hTextStorage.highlightr.setTheme(to: theme)
+        mTextStorage.highlightr.setTheme(to: theme)
+        hTextStorage.language = language
+        mTextStorage.language = language
+    }
+    
     private func handleGeneratedCode(_ hString:NSMutableString, _ mString:NSMutableString) {
-        
         var multiplier:CGFloat = 3/5.0
         if builder.config.codeType == .OC {
             configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
@@ -193,6 +237,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         }
         hTextViewHeightPriority = modifyConstraint(hTextViewHeightPriority, multiplier)
         configJsonTextView(text: hString as String, textView: hTextView, color: codeTextColor)
+        
         let state = generateFileBtn.state
         guard state == .on else { return }
         if let path = outputFilePath {
@@ -246,11 +291,26 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     /// config ui on main queue.
     
     private func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
+
+//        if let highlightr = Highlightr() {
+//            highlightr.setTheme(to: "paraiso-dark")
+//            if let attrString = highlightr.highlight(text, as: "swift") {
+//                DispatchQueue.main.async {
+//                    textView.textStorage?.setAttributedString(attrString)
+//                    textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
+//                    textView.textStorage?.foregroundColor = color
+//                }
+//            }
+//        }
+//
+        
         let attrString = NSAttributedString(string: text)
         DispatchQueue.main.async {
             textView.textStorage?.setAttributedString(attrString)
-            textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
-            textView.textStorage?.foregroundColor = color
+//            textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
+//            textView.textStorage?.foregroundColor = color
+            textView.textStorage?.foregroundColor = .clear
+
         }
     }
     
@@ -306,6 +366,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: UserDefaults.standard.integer(forKey: SupportJSONModelTypeCacheKey)) ?? .None
         jsonTypeBtn.selectItem(at: builder.config.jsonType.rawValue)
         generateFileBtn.state = UserDefaults.standard.bool(forKey: ShouldGenerateFileCacheKey) ? .on : .off
+        generateComment.state = UserDefaults.standard.bool(forKey: ShouldGenerateCommentCacheKey) ? .on : .off
     }
     
     /// save cache
@@ -313,9 +374,10 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     private func saveUserInputContent() {
       
         builder.config.codeType = SKCodeBuilderCodeType(rawValue: codeTypeBtn.indexOfSelectedItem + 1) ?? .OC
-        
+        UserDefaults.standard.set(codeTypeBtn.indexOfSelectedItem + 1, forKey: BuildCodeTypeCacheKey)
+
         var superClassName = ""
-        if builder.config.codeType == .Dart {
+        if builder.config.codeType == .Dart || builder.config.codeType == .TypeScript {
             superClassName = superClassNameTF.stringValue
         } else {
             superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
@@ -323,7 +385,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         UserDefaults.standard.setValue(superClassName, forKey: SuperClassNameCacheKey)
         builder.config.superClassName = superClassName
 
-        let modelNamePrefix = modelNamePrefixTF.stringValue.isBlank ? "NS" : modelNamePrefixTF.stringValue
+        let modelNamePrefix = modelNamePrefixTF.stringValue.isBlank ? "" : modelNamePrefixTF.stringValue
         UserDefaults.standard.setValue(modelNamePrefix, forKey: ModelNamePrefixCacheKey)
         builder.config.modelNamePrefix = modelNamePrefix
 
@@ -335,8 +397,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         UserDefaults.standard.setValue(authorName, forKey: AuthorNameCacheKey)
         builder.config.authorName = authorName
         
-        builder.config.codeType = SKCodeBuilderCodeType(rawValue: codeTypeBtn.indexOfSelectedItem + 1)!
-        UserDefaults.standard.set(codeTypeBtn.indexOfSelectedItem + 1, forKey: BuildCodeTypeCacheKey)
         
         builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: jsonTypeBtn.indexOfSelectedItem)!
         UserDefaults.standard.set(jsonTypeBtn.indexOfSelectedItem, forKey: SupportJSONModelTypeCacheKey)
@@ -350,6 +410,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         }
         UserDefaults.standard.setValue(outputFilePath, forKey: GenerateFilePathCacheKey)
         UserDefaults.standard.set(generateFileBtn.state == .on , forKey: ShouldGenerateFileCacheKey)
+        UserDefaults.standard.set(generateComment.state == .on , forKey: ShouldGenerateCommentCacheKey)
+        builder.config.shouldGenerateComment = (generateComment.state == .on)
     }
     
     override var representedObject: Any? {

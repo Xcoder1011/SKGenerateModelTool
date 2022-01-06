@@ -1,26 +1,34 @@
 # SKGenerateModelTool
 
-[![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg)  ![](https://img.shields.io/badge/Dart-flutter-blue) ![](https://img.shields.io/badge/Swift-91.7%25-brightgreen) ![](https://img.shields.io/badge/license-MIT-green)
+[![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg)  ![](https://img.shields.io/badge/Dart-flutter-blue)
+    ![](https://img.shields.io/badge/TypeScript-interface-brightgreen)
+    ![](https://img.shields.io/badge/Swift-91.7%25-brightgreen)
+    ![](https://img.shields.io/badge/license-MIT-green)
 
-- 支持Objective-C / Swift / Dart
+- 支持Objective-C / Swift / Dart / TypeScript
 - 支持通过URL链接或json字符串一键生成model文件
-- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
-- 支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名
-- 支持自定义输出文件夹路径
 - 兼容YYModel / MJExtension / HandyJSON解析
-- 兼容服务端返回“id”字段
-- 类驼峰命名
+- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
+- 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
+- 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
+- 支持导出TypeScript Interfaces
+- 支持自定义导出文件路径
 - Flutter Model解析兼容了服务端返回string/int/double时数据类型混用的情况
+- 兼容服务端返回“id”字段
+- 支持类驼峰命名
 
-- Support OC / Swift / Dart
+- Support OC / Swift / Dart / TypeScript
 - Supports one-click generation of model files through URL links or json strings
-- Support string encryption (different keys can be set, developers can modify the encryption algorithm)
-- Support custom model parent class, custom model prefix, custom file name, custom author name
-- Support custom output folder path
 - Compatible with YYModel / MJExtension analysis
+- Support string encryption (different keys can be set, developers can modify the encryption algorithm)
+- Support custom model superclass name, custom model prefix, custom author name, add comments
+- Support code highlighting(It uses [highlight.js](https://highlightjs.org/) as it core)
+- Support for exporting TypeScript Interfaces
+- Support custom output folder path
+- Flutter model parsing is compatible with mixed data types when the server returns string / int / double
 - Compatible server returns "id" field
 - Supports hump naming
-- Flutter model parsing is compatible with mixed data types when the server returns string / int / double
+
 
 ![SKGenerateModelTool](../master/images/home.png)
 
@@ -127,6 +135,9 @@ Map<String, dynamic> _$SKDataModelToJson(SKDataModel instance) {
 
 ###### Flutter Model header
 ![header](../master/images/flutter1.png)
+
+###### TypeScript Interfaces
+![header](../master/images/typescript.png)
 
 ###### 字符串加密示例
 ![字符串加密示例](../master/images/encrypt.png)

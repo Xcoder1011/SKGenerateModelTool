@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A44B9CFD2786953900BA8991 /* xcode.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9C992786953900BA8991 /* xcode.min.css */; };
+		A44B9D002786953900BA8991 /* vs2015.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9C9C2786953900BA8991 /* vs2015.min.css */; };
+		A44B9D2C2786953A00BA8991 /* github.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9CC82786953900BA8991 /* github.min.css */; };
+		A44B9D512786953A00BA8991 /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = A44B9CEE2786953900BA8991 /* highlight.min.js */; };
+		A44B9D522786953A00BA8991 /* CodeAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B9CF02786953900BA8991 /* CodeAttributedString.swift */; };
+		A44B9D532786953A00BA8991 /* Highlightr.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B9CF12786953900BA8991 /* Highlightr.swift */; };
+		A44B9D552786953A00BA8991 /* HTMLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B9CF32786953900BA8991 /* HTMLUtils.swift */; };
+		A44B9D562786953A00BA8991 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B9CF42786953900BA8991 /* Theme.swift */; };
+		A44B9D572786953A00BA8991 /* Shims.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44B9CF52786953900BA8991 /* Shims.swift */; };
+		A44B9D5D27870E5500BA8991 /* androidstudio.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9D5C27870E5500BA8991 /* androidstudio.min.css */; };
+		A44B9D5F27870E8100BA8991 /* vs.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9D5E27870E8100BA8991 /* vs.min.css */; };
+		A44B9D6127870EA900BA8991 /* idea.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9D6027870EA900BA8991 /* idea.min.css */; };
+		A44B9D6B2787173F00BA8991 /* docco.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9D6A2787173F00BA8991 /* docco.min.css */; };
+		A44B9D6D2787193E00BA8991 /* pojoaque.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A44B9D6C2787193E00BA8991 /* pojoaque.min.css */; };
 		BC6E5D5224C0770800809D98 /* EncryptExampleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC6E5D5124C0770800809D98 /* EncryptExampleModel.m */; };
 		BC874A1A250A238C00F3A346 /* SKTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC874A19250A238C00F3A346 /* SKTextView.swift */; };
 		BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88CEA02467A8A600A4828B /* AppDelegate.swift */; };
@@ -19,6 +33,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A44B9C992786953900BA8991 /* xcode.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = xcode.min.css; sourceTree = "<group>"; };
+		A44B9C9C2786953900BA8991 /* vs2015.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = vs2015.min.css; sourceTree = "<group>"; };
+		A44B9CC82786953900BA8991 /* github.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = github.min.css; sourceTree = "<group>"; };
+		A44B9CEE2786953900BA8991 /* highlight.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
+		A44B9CF02786953900BA8991 /* CodeAttributedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodeAttributedString.swift; sourceTree = "<group>"; };
+		A44B9CF12786953900BA8991 /* Highlightr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Highlightr.swift; sourceTree = "<group>"; };
+		A44B9CF32786953900BA8991 /* HTMLUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTMLUtils.swift; sourceTree = "<group>"; };
+		A44B9CF42786953900BA8991 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A44B9CF52786953900BA8991 /* Shims.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shims.swift; sourceTree = "<group>"; };
+		A44B9D5C27870E5500BA8991 /* androidstudio.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = androidstudio.min.css; sourceTree = "<group>"; };
+		A44B9D5E27870E8100BA8991 /* vs.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = vs.min.css; sourceTree = "<group>"; };
+		A44B9D6027870EA900BA8991 /* idea.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = idea.min.css; sourceTree = "<group>"; };
+		A44B9D6A2787173F00BA8991 /* docco.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = docco.min.css; sourceTree = "<group>"; };
+		A44B9D6C2787193E00BA8991 /* pojoaque.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = pojoaque.min.css; sourceTree = "<group>"; };
 		BC6E5BD824C071EE00809D98 /* SKEncryptHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKEncryptHeader.h; sourceTree = "<group>"; };
 		BC6E5D5024C0770800809D98 /* EncryptExampleModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncryptExampleModel.h; sourceTree = "<group>"; };
 		BC6E5D5124C0770800809D98 /* EncryptExampleModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncryptExampleModel.m; sourceTree = "<group>"; };
@@ -47,6 +75,59 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A44B9C8F2786922C00BA8991 /* Highlightr */ = {
+			isa = PBXGroup;
+			children = (
+				A44B9C902786953900BA8991 /* Assets */,
+				A44B9CEF2786953900BA8991 /* Classes */,
+			);
+			path = Highlightr;
+			sourceTree = "<group>";
+		};
+		A44B9C902786953900BA8991 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				A44B9C922786953900BA8991 /* styles */,
+				A44B9CEC2786953900BA8991 /* Highlighter */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		A44B9C922786953900BA8991 /* styles */ = {
+			isa = PBXGroup;
+			children = (
+				A44B9C992786953900BA8991 /* xcode.min.css */,
+				A44B9C9C2786953900BA8991 /* vs2015.min.css */,
+				A44B9CC82786953900BA8991 /* github.min.css */,
+				A44B9D5E27870E8100BA8991 /* vs.min.css */,
+				A44B9D6C2787193E00BA8991 /* pojoaque.min.css */,
+				A44B9D5C27870E5500BA8991 /* androidstudio.min.css */,
+				A44B9D6A2787173F00BA8991 /* docco.min.css */,
+				A44B9D6027870EA900BA8991 /* idea.min.css */,
+			);
+			path = styles;
+			sourceTree = "<group>";
+		};
+		A44B9CEC2786953900BA8991 /* Highlighter */ = {
+			isa = PBXGroup;
+			children = (
+				A44B9CEE2786953900BA8991 /* highlight.min.js */,
+			);
+			path = Highlighter;
+			sourceTree = "<group>";
+		};
+		A44B9CEF2786953900BA8991 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				A44B9CF02786953900BA8991 /* CodeAttributedString.swift */,
+				A44B9CF12786953900BA8991 /* Highlightr.swift */,
+				A44B9CF32786953900BA8991 /* HTMLUtils.swift */,
+				A44B9CF42786953900BA8991 /* Theme.swift */,
+				A44B9CF52786953900BA8991 /* Shims.swift */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
 		BC88CE942467A8A600A4828B = {
 			isa = PBXGroup;
 			children = (
@@ -66,6 +147,7 @@
 		BC88CE9F2467A8A600A4828B /* SKGenerateModelTool */ = {
 			isa = PBXGroup;
 			children = (
+				A44B9C8F2786922C00BA8991 /* Highlightr */,
 				BC88CEA02467A8A600A4828B /* AppDelegate.swift */,
 				BC88CEA22467A8A600A4828B /* ViewController.swift */,
 				BCB184B224B808AF00C2A5D3 /* SKEncryptString */,
@@ -151,7 +233,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A44B9D2C2786953A00BA8991 /* github.min.css in Resources */,
+				A44B9D6127870EA900BA8991 /* idea.min.css in Resources */,
+				A44B9CFD2786953900BA8991 /* xcode.min.css in Resources */,
 				BC88CEA52467A8AA00A4828B /* Assets.xcassets in Resources */,
+				A44B9D002786953900BA8991 /* vs2015.min.css in Resources */,
+				A44B9D6D2787193E00BA8991 /* pojoaque.min.css in Resources */,
+				A44B9D5D27870E5500BA8991 /* androidstudio.min.css in Resources */,
+				A44B9D512786953A00BA8991 /* highlight.min.js in Resources */,
+				A44B9D5F27870E8100BA8991 /* vs.min.css in Resources */,
+				A44B9D6B2787173F00BA8991 /* docco.min.css in Resources */,
 				BC88CEA82467A8AA00A4828B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -167,9 +258,14 @@
 				BC874A1A250A238C00F3A346 /* SKTextView.swift in Sources */,
 				BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */,
 				BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */,
+				A44B9D562786953A00BA8991 /* Theme.swift in Sources */,
+				A44B9D552786953A00BA8991 /* HTMLUtils.swift in Sources */,
 				BC88CEA32467A8A600A4828B /* ViewController.swift in Sources */,
 				BCB184B424B8090500C2A5D3 /* SKEncryptTool.swift in Sources */,
 				BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */,
+				A44B9D522786953A00BA8991 /* CodeAttributedString.swift in Sources */,
+				A44B9D572786953A00BA8991 /* Shims.swift in Sources */,
+				A44B9D532786953A00BA8991 /* Highlightr.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,7 +409,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";
@@ -335,7 +431,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";
