@@ -6,7 +6,7 @@
     ![](https://img.shields.io/badge/license-MIT-green)
 
 
-- [x] 支持**Objective-C** / **Swift** / **Dart** / **TypeScript**等多种语言
+- [x] 支持`Objective-C` / `Swift` / `Dart` / `TypeScript`
 - [x] 支持通过`URL`链接或`json`字符串一键生成model文件
 - [x] 兼容`YYModel` / `MJExtension` / `HandyJSON`解析
 - [x] 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
@@ -18,7 +18,7 @@
 - [x] 兼容服务端返回“id”字段
 - [x] 支持类驼峰命名
 
-- Support **Objective-C** / **Swift** / **Dart** / **TypeScript**
+- Support `Objective-C` / `Swift` / `Dart` / `TypeScript`
 - Supports one-click generation of model files through `URL` links or `json` strings
 - Compatible with `YYModel` / `MJExtension` / `HandyJSON` analysis
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
@@ -32,7 +32,7 @@
 
 ### Usage
 
-> * 方式一：直接下载软件安装 [![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg) 
+> * 方式一：直接下载软件安装 [点击下载](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg) 
 > * 方式二：下载代码运行
 
 
