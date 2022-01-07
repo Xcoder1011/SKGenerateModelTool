@@ -92,7 +92,20 @@ class SKCodeBuilder: NSObject {
         handleDictValue(dictValue: jsonObj, key: "", hString: hString, mString: mString)
         if config.codeType == .OC {
             if config.superClassName == "NSObject" {
-                hString.insert("\n#import <Foundation/Foundation.h>\n\n", at: 0)
+                if ((config.jsonType == .YYModel) && (config.superClassName.compare("NSObject") == .orderedSame)) {
+                let string =
+        """
+        \n#if __has_include(<YYModel/YYModel.h>)
+        #import <YYModel/YYModel.h>
+        #else
+        #import "YYModel.h"
+        #endif\n\n
+        """
+                    hString.insert(string, at: 0)
+                } else {
+                    hString.insert("\n#import <Foundation/Foundation.h>\n\n", at: 0)
+                }
+                
             } else {
                 hString.insert("\n#import \"\(config.superClassName).h\"\n\n", at: 0)
             }
@@ -205,12 +218,20 @@ class SKCodeBuilder: NSObject {
         
         if config.codeType == .OC {
             if key.isBlank { // Root model
-                hString.append("\n@interface \(config.rootModelName) : \(config.superClassName)\n\n")
+                if ((config.jsonType == .YYModel) && (config.superClassName.compare("NSObject") == .orderedSame)) {
+                    hString.append("\n@interface \(config.rootModelName) : \(config.superClassName) <YYModel>\n\n")
+                } else {
+                    hString.append("\n@interface \(config.rootModelName) : \(config.superClassName)\n\n")
+                }
                 mString.append("\n@implementation \(config.rootModelName)\n\n")
             } else { // sub model
                 let modelName = modelClassName(with: key)
                 hString.insert("@class \(modelName);\n", at: 0)
-                hString.append("\n@interface \(modelName) : \(config.superClassName)\n\n")
+                if ((config.jsonType == .YYModel) && (config.superClassName.compare("NSObject") == .orderedSame)) {
+                    hString.append("\n@interface \(modelName) : \(config.superClassName) <YYModel>\n\n")
+                } else {
+                    hString.append("\n@interface \(modelName) : \(config.superClassName)\n\n")
+                }
                 mString.append("\n@implementation \(modelName)\n\n")
             }
         } else if config.codeType == .Swift {

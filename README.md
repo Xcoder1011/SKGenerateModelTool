@@ -5,141 +5,55 @@
     ![](https://img.shields.io/badge/Swift-91.7%25-brightgreen)
     ![](https://img.shields.io/badge/license-MIT-green)
 
-- 支持Objective-C / Swift / Dart / TypeScript
-- 支持通过URL链接或json字符串一键生成model文件
-- 兼容YYModel / MJExtension / HandyJSON解析
-- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
-- 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
-- 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
-- 支持导出TypeScript Interfaces
-- 支持自定义导出文件路径
-- Flutter Model解析兼容了服务端返回string/int/double时数据类型混用的情况
-- 兼容服务端返回“id”字段
-- 支持类驼峰命名
 
-- Support OC / Swift / Dart / TypeScript
-- Supports one-click generation of model files through URL links or json strings
-- Compatible with YYModel / MJExtension analysis
+- [x] 支持**Objective-C** / **Swift** / **Dart** / **TypeScript**等多种语言
+- [x] 支持通过`URL`链接或`json`字符串一键生成model文件
+- [x] 兼容`YYModel` / `MJExtension` / `HandyJSON`解析
+- [x] 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
+- [x] 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
+- [x] 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
+- [x] 支持导出`TypeScript Interfaces`
+- [x] 支持自定义导出文件路径
+- [x] `Flutter Model`解析兼容了服务端返回`string/int/double`时数据类型混用的情况
+- [x] 兼容服务端返回“id”字段
+- [x] 支持类驼峰命名
+
+- Support **Objective-C** / **Swift** / **Dart** / **TypeScript**
+- Supports one-click generation of model files through `URL` links or `json` strings
+- Compatible with `YYModel` / `MJExtension` / `HandyJSON` analysis
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
 - Support custom model superclass name, custom model prefix, custom author name, add comments
 - Support code highlighting(It uses [highlight.js](https://highlightjs.org/) as it core)
-- Support for exporting TypeScript Interfaces
+- Support for exporting `TypeScript Interfaces`
 - Support custom output folder path
-- Flutter model parsing is compatible with mixed data types when the server returns string / int / double
+- `Flutter model` parsing is compatible with mixed data types when the server returns string / int / double
 - Compatible server returns "id" field
 - Supports hump naming
 
+### Usage
 
-![SKGenerateModelTool](../master/images/home.png)
+> * 方式一：直接下载软件安装 [![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg) 
+> * 方式二：下载代码运行
 
 
-###### 生成Flutter Dart Model
+### Objective-C
 
-```
-//
-//  news_response.dart
-//  SKGenerateModelTool
-//
-//  Created by wushangkun on 2021/01/29.
-//  Copyright © 2021 SKGenerateModelTool. All rights reserved.
-//
+![Objective-C](../master/images/home.png)
 
-part 'news_response.m.dart';
+### Swift
 
-class NewsResponse {
-   List<SKDataModel> data;  
-   String msg;  // success
-   int code;  // 200
+![Swift](../master/images/swift.png)
 
-   NewsResponse fromJson(Map<String, dynamic> json) => _$NewsResponseFromJson(json, this);
-   Map<String, dynamic> toJson() => _$NewsResponseToJson(this);
-}
+### Dart
 
-class SKDataModel {
-   String title;  
-   String source;  // 环球网资讯
-   String imgsrc;  
+![Dart](../master/images/dart.png)
 
-   SKDataModel fromJson(Map<String, dynamic> json) => _$SKDataModelFromJson(json, this);
-   Map<String, dynamic> toJson() => _$SKDataModelToJson(this);
-}
+### TypeScript Interfaces
 
-```
+![TypeScript](../master/images/typescript.png)
 
-实现文件
+### 字符串加密示例
 
-```
-//
-//  news_response.m.dart
-//  SKGenerateModelTool
-//
-//  Created by wushangkun on 2021/01/29.
-//  Copyright © 2021 SKGenerateModelTool. All rights reserved.
-//
-
-part of 'news_response.dart';
-
-NewsResponse _$NewsResponseFromJson(Map<String, dynamic> json, NewsResponse instance) {
-   if(json['data'] != null) {
-     instance.data = new List<SKDataModel>();
-     (json['data'] as List).forEach((v) {
-       instance.data.add(new SKDataModel().fromJson(v));
-     });
-   }
-   if(json['msg'] != null) {
-     instance.msg = json['msg']?.toString();
-   }
-   if(json['code'] != null) {
-     final code = json['code'];
-     if(code is String) {
-       instance.code = int.parse(code);
-     } else {
-       instance.code = code?.toInt();
-     }
-   }
-   return instance;
-}
-
-Map<String, dynamic> _$NewsResponseToJson(NewsResponse instance) {
-   final Map<String, dynamic> json = new Map<String, dynamic>();
-   if(instance.data != null) {
-     json['data'] = instance.data.map((v) => v.toJson()).toList();
-   }
-   json['msg'] = instance.msg;
-    json['code'] = instance.code;
-   return json;
-}
-
-SKDataModel _$SKDataModelFromJson(Map<String, dynamic> json, SKDataModel instance) {
-   if(json['title'] != null) {
-     instance.title = json['title']?.toString();
-   }
-   if(json['source'] != null) {
-     instance.source = json['source']?.toString();
-   }
-   if(json['imgsrc'] != null) {
-     instance.imgsrc = json['imgsrc']?.toString();
-   }
-   return instance;
-}
-
-Map<String, dynamic> _$SKDataModelToJson(SKDataModel instance) {
-   final Map<String, dynamic> json = new Map<String, dynamic>();
-   json['title'] = instance.title;
-   json['source'] = instance.source;
-   json['imgsrc'] = instance.imgsrc;
-   return json;
-}
-
-```
-
-###### Flutter Model header
-![header](../master/images/flutter1.png)
-
-###### TypeScript Interfaces
-![header](../master/images/typescript.png)
-
-###### 字符串加密示例
 ![字符串加密示例](../master/images/encrypt.png)
 
 加密后的内容添加到项目中（声明和定义可以分别放.h和.m），因为代码依赖SKEncryptString结构体，所以需要导入头文件**SKEncryptHeader.h**引用。
@@ -206,5 +120,3 @@ const SKEncryptString * const _3908173925 = &(SKEncryptString){
 Tip：本工具仅用到简单的XOR加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的dmg文件进行安装使用。
 
 - 简书地址：[https://www.jianshu.com/p/a2ee31a04252](https://www.jianshu.com/p/a2ee31a04252)
-
-

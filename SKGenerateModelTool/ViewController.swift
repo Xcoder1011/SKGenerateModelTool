@@ -291,24 +291,9 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     /// config ui on main queue.
     
     private func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
-
-//        if let highlightr = Highlightr() {
-//            highlightr.setTheme(to: "paraiso-dark")
-//            if let attrString = highlightr.highlight(text, as: "swift") {
-//                DispatchQueue.main.async {
-//                    textView.textStorage?.setAttributedString(attrString)
-//                    textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
-//                    textView.textStorage?.foregroundColor = color
-//                }
-//            }
-//        }
-//
-        
         let attrString = NSAttributedString(string: text)
         DispatchQueue.main.async {
             textView.textStorage?.setAttributedString(attrString)
-//            textView.textStorage?.font = NSFont.systemFont(ofSize: 15)
-//            textView.textStorage?.foregroundColor = color
             textView.textStorage?.foregroundColor = .clear
 
         }
@@ -397,15 +382,12 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         UserDefaults.standard.setValue(authorName, forKey: AuthorNameCacheKey)
         builder.config.authorName = authorName
         
-        
         builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: jsonTypeBtn.indexOfSelectedItem)!
         UserDefaults.standard.set(jsonTypeBtn.indexOfSelectedItem, forKey: SupportJSONModelTypeCacheKey)
 
         if builder.config.superClassName.compare("NSObject") == .orderedSame {
             if builder.config.jsonType == .HandyJSON {
                 builder.config.superClassName = "HandyJSON"
-            } else if builder.config.jsonType == .YYModel {
-                builder.config.superClassName = "YYModel"
             }
         }
         UserDefaults.standard.setValue(outputFilePath, forKey: GenerateFilePathCacheKey)
