@@ -6,17 +6,18 @@
     ![](https://img.shields.io/badge/license-MIT-green)
 
 
-- [x] 支持`Objective-C` / `Swift` / `Dart` / `TypeScript`
-- [x] 支持通过`URL`链接或`json`字符串一键生成model文件
-- [x] 兼容`YYModel` / `MJExtension` / `HandyJSON`解析
-- [x] 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
-- [x] 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
-- [x] 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
-- [x] 支持导出`TypeScript Interfaces`
-- [x] 支持自定义导出文件路径
-- [x] `Flutter Model`解析兼容了服务端返回`string/int/double`时数据类型混用的情况
-- [x] 兼容服务端返回“id”字段
-- [x] 支持类驼峰命名
+- 支持`Objective-C` / `Swift` / `Dart` / `TypeScript`
+- 支持通过`URL`链接或`json`字符串一键生成model文件
+- 兼容`YYModel` / `MJExtension` / `HandyJSON`解析
+- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
+- 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
+- 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
+- 支持导出`TypeScript Interfaces`
+- 支持自定义导出文件路径
+- `Flutter Model`解析兼容了服务端返回`string/int/double`时数据类型混用的情况
+- 兼容服务端返回“id”字段
+- 支持类驼峰命名
+
 
 - Support `Objective-C` / `Swift` / `Dart` / `TypeScript`
 - Supports one-click generation of model files through `URL` links or `json` strings
