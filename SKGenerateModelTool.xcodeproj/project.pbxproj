@@ -30,6 +30,12 @@
 		BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */; };
 		BCB184B424B8090500C2A5D3 /* SKEncryptTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */; };
 		BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */; };
+		E04D748A2DB78945000913C0 /* SKStringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74892DB78945000913C0 /* SKStringExtension.swift */; };
+		E04D748B2DB78945000913C0 /* SKCodeBuilderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74832DB78945000913C0 /* SKCodeBuilderConfig.swift */; };
+		E04D748C2DB78945000913C0 /* SKModelGeneratorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74882DB78945000913C0 /* SKModelGeneratorUtils.swift */; };
+		E04D748E2DB78945000913C0 /* SKCodeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74842DB78945000913C0 /* SKCodeTypes.swift */; };
+		E04D748F2DB78945000913C0 /* SKModelGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74862DB78945000913C0 /* SKModelGenerator.swift */; };
+		E04D74902DB78945000913C0 /* SKFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74852DB78945000913C0 /* SKFileManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +68,12 @@
 		BCB184B324B8090500C2A5D3 /* SKEncryptTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKEncryptTool.swift; sourceTree = "<group>"; };
 		BCB184B524B85CC700C2A5D3 /* SKGenerateModelTool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SKGenerateModelTool-Bridging-Header.h"; sourceTree = "<group>"; };
 		BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionController.swift; sourceTree = "<group>"; };
+		E04D74832DB78945000913C0 /* SKCodeBuilderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCodeBuilderConfig.swift; sourceTree = "<group>"; };
+		E04D74842DB78945000913C0 /* SKCodeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCodeTypes.swift; sourceTree = "<group>"; };
+		E04D74852DB78945000913C0 /* SKFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKFileManager.swift; sourceTree = "<group>"; };
+		E04D74862DB78945000913C0 /* SKModelGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKModelGenerator.swift; sourceTree = "<group>"; };
+		E04D74882DB78945000913C0 /* SKModelGeneratorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKModelGeneratorUtils.swift; sourceTree = "<group>"; };
+		E04D74892DB78945000913C0 /* SKStringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKStringExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,12 +159,18 @@
 		BC88CE9F2467A8A600A4828B /* SKGenerateModelTool */ = {
 			isa = PBXGroup;
 			children = (
+				BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */,
+				E04D74832DB78945000913C0 /* SKCodeBuilderConfig.swift */,
+				E04D74842DB78945000913C0 /* SKCodeTypes.swift */,
+				E04D74852DB78945000913C0 /* SKFileManager.swift */,
+				E04D74862DB78945000913C0 /* SKModelGenerator.swift */,
+				E04D74882DB78945000913C0 /* SKModelGeneratorUtils.swift */,
+				E04D74892DB78945000913C0 /* SKStringExtension.swift */,
 				A44B9C8F2786922C00BA8991 /* Highlightr */,
 				BC88CEA02467A8A600A4828B /* AppDelegate.swift */,
 				BC88CEA22467A8A600A4828B /* ViewController.swift */,
 				BCB184B224B808AF00C2A5D3 /* SKEncryptString */,
 				BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */,
-				BC88D01D2467C2AA00A4828B /* SKCodeBuilder.swift */,
 				BC874A19250A238C00F3A346 /* SKTextView.swift */,
 				BC88CEA42467A8AA00A4828B /* Assets.xcassets */,
 				BC88CEA62467A8AA00A4828B /* Main.storyboard */,
@@ -265,6 +283,12 @@
 				BC88CEA12467A8A600A4828B /* AppDelegate.swift in Sources */,
 				A44B9D522786953A00BA8991 /* CodeAttributedString.swift in Sources */,
 				A44B9D572786953A00BA8991 /* Shims.swift in Sources */,
+				E04D748A2DB78945000913C0 /* SKStringExtension.swift in Sources */,
+				E04D748B2DB78945000913C0 /* SKCodeBuilderConfig.swift in Sources */,
+				E04D748C2DB78945000913C0 /* SKModelGeneratorUtils.swift in Sources */,
+				E04D748E2DB78945000913C0 /* SKCodeTypes.swift in Sources */,
+				E04D748F2DB78945000913C0 /* SKModelGenerator.swift in Sources */,
+				E04D74902DB78945000913C0 /* SKFileManager.swift in Sources */,
 				A44B9D532786953A00BA8991 /* Highlightr.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

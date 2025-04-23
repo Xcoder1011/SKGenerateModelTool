@@ -9,46 +9,49 @@
 import Cocoa
 
 class ViewController: NSViewController, NSControlTextEditingDelegate {
+    // MARK: - IBOutlets
     
-    @IBOutlet weak var urlTF: NSTextField!
+    @IBOutlet var urlTF: NSTextField!
     @IBOutlet var jsonTextView: SKTextView!
     @IBOutlet var hTextView: NSTextView!
     @IBOutlet var mTextView: NSTextView!
-    @IBOutlet weak var hTextViewHeightPriority: NSLayoutConstraint!
-    @IBOutlet weak var superClassNameTF: NSTextField!  /// default 3:5
-    @IBOutlet weak var modelNamePrefixTF: NSTextField!
-    @IBOutlet weak var rootModelNameTF: NSTextField!
-    @IBOutlet weak var authorNameTF: NSTextField!
-    @IBOutlet weak var reqTypeBtn: NSPopUpButton!
-    @IBOutlet weak var codeTypeBtn: NSPopUpButton!
-    @IBOutlet weak var jsonTypeBtn: NSPopUpButton!
-    @IBOutlet weak var generateFileBtn: NSButton!  // 生成文件
-    @IBOutlet weak var generateComment: NSButton!  // 生成注释
+    @IBOutlet var hTextViewHeightPriority: NSLayoutConstraint!
+    @IBOutlet var superClassNameTF: NSTextField!
+    @IBOutlet var modelNamePrefixTF: NSTextField!
+    @IBOutlet var rootModelNameTF: NSTextField!
+    @IBOutlet var authorNameTF: NSTextField!
+    @IBOutlet var reqTypeBtn: NSPopUpButton!
+    @IBOutlet var codeTypeBtn: NSPopUpButton!
+    @IBOutlet var jsonTypeBtn: NSPopUpButton!
+    @IBOutlet var generateFileBtn: NSButton!
+    @IBOutlet var generateComment: NSButton!
+        
+    /// 缓存键
+    private enum CacheKeys {
+        static let lastInputURL = "LastInputURLCacheKey"
+        static let superClassName = "SuperClassNameCacheKey"
+        static let rootModelName = "RootModelNameCacheKey"
+        static let modelNamePrefix = "ModelNamePrefixCacheKey"
+        static let authorName = "AuthorNameCacheKey"
+        static let buildCodeType = "BuildCodeTypeCacheKey"
+        static let supportJSONModelType = "SupportJSONModelTypeCacheKey"
+        static let shouldGenerateFile = "ShouldGenerateFileCacheKey"
+        static let generateFilePath = "GenerateFilePathCacheKey"
+        static let shouldGenerateComment = "ShouldGenerateCommentCacheKey"
+    }
     
-    /// cache key
-
-    let LastInputURLCacheKey = "LastInputURLCacheKey"
-    let SuperClassNameCacheKey = "SuperClassNameCacheKey"
-    let RootModelNameCacheKey = "RootModelNameCacheKey"
-    let ModelNamePrefixCacheKey = "ModelNamePrefixCacheKey"
-    let AuthorNameCacheKey = "AuthorNameCacheKey"
-    let BuildCodeTypeCacheKey = "BuildCodeTypeCacheKey"
-    let SupportJSONModelTypeCacheKey = "SupportJSONModelTypeCacheKey"
-    let ShouldGenerateFileCacheKey = "ShouldGenerateFileCacheKey"
-    let GenerateFilePathCacheKey = "GenerateFilePathCacheKey"
-    let ShouldGenerateCommentCacheKey = "ShouldGenerateCommentCacheKey"
-
-    var builder = SKCodeBuilder()
-
-    var outputFilePath: String?
-    var currentInputTF: NSTextField?
+    // MARK: - Properties
     
-    lazy var jsonTextColor = NSColor.blue
-    lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
+    private var builder = SKCodeBuilder()
+    private var outputFilePath: String?
+    private var currentInputTF: NSTextField?
+    
+    private lazy var jsonTextColor = NSColor.blue
+    private lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0, blue: 143/255.0, alpha: 1.0)
     
     private lazy var jsonTextStorage: CodeAttributedString = {
         let storage = CodeAttributedString()
-        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.setTheme(to: SKCodeType.objectiveC.theme)
         storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
         storage.language = "json"
         return storage
@@ -56,35 +59,23 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     private lazy var hTextStorage: CodeAttributedString = {
         let storage = CodeAttributedString()
-        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.setTheme(to: SKCodeType.objectiveC.theme)
         storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
-        storage.language = SKCodeBuilderCodeType.OC.language
+        storage.language = SKCodeType.objectiveC.language
         return storage
     }()
     
     private lazy var mTextStorage: CodeAttributedString = {
         let storage = CodeAttributedString()
-        storage.highlightr.setTheme(to: SKCodeBuilderCodeType.OC.theme)
+        storage.highlightr.setTheme(to: SKCodeType.objectiveC.theme)
         storage.highlightr.theme.codeFont = NSFont(name: "Menlo", size: 14)
-        storage.language = SKCodeBuilderCodeType.OC.language
+        storage.language = SKCodeType.objectiveC.language
         return storage
     }()
-
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        reqTypeBtn.removeAllItems()
-        reqTypeBtn.addItems(withTitles: ["GET","POST"])
-        reqTypeBtn.selectItem(at: 0)
-        
-        codeTypeBtn.removeAllItems()
-        codeTypeBtn.addItems(withTitles: ["Objective-C","Swift","Dart","TypeScript"])
-        codeTypeBtn.selectItem(at: 0)
-
-        jsonTypeBtn.removeAllItems()
-        jsonTypeBtn.addItems(withTitles: ["None","YYModel","MJExtension","HandyJSON"])
-        jsonTypeBtn.selectItem(at: 0)
-        
+        setupUI()
         jsonTextStorage.addLayoutManager(jsonTextView.layoutManager!)
         hTextStorage.addLayoutManager(hTextView.layoutManager!)
         mTextStorage.addLayoutManager(mTextView.layoutManager!)
@@ -95,127 +86,174 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         loadUserLastInputContent()
         updateCodeTheme()
     }
+    
+    private func setupUI() {
+        // 网络请求类型
+        reqTypeBtn.removeAllItems()
+        reqTypeBtn.addItems(withTitles: ["GET", "POST"])
+        reqTypeBtn.selectItem(at: 0)
         
-    /// GET / POST request URL
-
+        // 代码类型
+        codeTypeBtn.removeAllItems()
+        codeTypeBtn.addItems(withTitles: SKCodeType.allCases.map { $0.rawValue })
+        codeTypeBtn.selectItem(at: 0)
+        
+        // JSON解析框架类型
+        jsonTypeBtn.removeAllItems()
+        jsonTypeBtn.addItems(withTitles: SKJSONModelType.allCases.map { $0.rawValue })
+        jsonTypeBtn.selectItem(at: 0)
+    }
+    
+    // MARK: - IBActions
+    
+    /// 通过URL获取JSON数据
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
         updateCodeTheme()
         var urlString = urlTF.stringValue
         if urlString.isBlank { return }
         urlString = urlString.urlEncoding()
-        print("encode URL = \(urlTF.stringValue)")
-        UserDefaults.standard.setValue(urlString, forKey: LastInputURLCacheKey)
-        let session = URLSession.shared
-        let url = URL(string: urlString)
-        var request = URLRequest(url: url!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+        UserDefaults.standard.setValue(urlString, forKey: CacheKeys.lastInputURL)
         
+        let session = URLSession.shared
+        guard let url = URL(string: urlString) else { return }
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+        
+        // 处理POST请求
         if reqTypeBtn.indexOfSelectedItem == 1 {
-            if let query = url?.query {
-                urlString = urlString.replacingOccurrences(of: query, with: "")
-                if urlString.hasSuffix("?") {
-                    urlString.removeLast()
+            if let query = url.query {
+                var urlWithoutQuery = urlString.replacingOccurrences(of: query, with: "")
+                if urlWithoutQuery.hasSuffix("?") {
+                    urlWithoutQuery.removeLast()
                 }
-                request = URLRequest(url: URL(string: urlString)!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-                if let httpBody = query.data(using: .utf8) {
-                    print("httpBody query = \(query)")
-                    request.httpBody = httpBody
+                if let newUrl = URL(string: urlWithoutQuery) {
+                    request = URLRequest(url: newUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+                    if let httpBody = query.data(using: .utf8) {
+                        request.httpBody = httpBody
+                    }
                 }
             }
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             request.httpMethod = "POST"
         }
-
-        let task = session.dataTask(with: request) { [weak self] (data, response, error) in
+        
+        let task = session.dataTask(with: request) { [weak self] data, _, error in
             guard let data = data, error == nil else { return }
             do {
                 let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
                 if JSONSerialization.isValidJSONObject(jsonObj) {
                     let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
                     if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
-                        self?.configJsonTextView(text: jsonString, textView: self!.jsonTextView, color: NSColor.blue)
+                        DispatchQueue.main.async {
+                            self?.configJsonTextView(text: jsonString, textView: self!.jsonTextView, color: NSColor.blue)
+                        }
                     }
                 }
-            } catch let error {
-                print(" error = \(error)")
+            } catch {
+                print("JSON解析错误 = \(error)")
             }
         }
         task.resume()
     }
     
-    /// start generate code....
-    
+    /// 开始生成代码
     @IBAction func startMakeCode(_ sender: NSButton) {
-        if let jsonString = jsonTextView.textStorage?.string {
-            if jsonString.isBlank { return }
-            let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
-            let attriStr = NSMutableString(string: trimmedStr)
-            var commentDicts:[String:String] = [:]
-            attriStr.enumerateLines { (line, _) in
-                if line.contains("//") {
-                    let substrings = line.components(separatedBy: "//")
-                    let hasHttpLink = line.contains("http://") || line.contains("https://") || line.contains("://")
-                    // 只有图片链接 且没注释的情况下 不做截断操作
-                    let cannComment = !(substrings.count == 2 && hasHttpLink)
-                    guard cannComment else { return }
-                    let trimmedLineStr = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                    let position = trimmedLineStr.postionOf(sub: "//",backwards: true)
-                    if position >= 0 {
-                        let linestr = trimmedLineStr.prefix(position)
-                        var keystr = String(linestr).trimmingCharacters(in: .whitespacesAndNewlines)
-                        let commentstr = trimmedLineStr.suffix(trimmedLineStr.count - position)
-                        if keystr.contains(":") {
-                          let lines = keystr.components(separatedBy: ":")
-                            keystr = lines.first ?? ""
-                            keystr = keystr.replacingOccurrences(of: "\"", with: "")
-                            keystr = keystr.trimmingCharacters(in: .whitespacesAndNewlines)
-                            let comment = String(commentstr).replacingOccurrences(of: "//", with: "")
-                            commentDicts.updateValue(comment, forKey: keystr)
-                        }
-                        let range = attriStr.range(of: String(commentstr))
-                        attriStr.replaceCharacters(in: range, with: "")
-                    }
-                }
-            }
-            
+        guard let jsonString = jsonTextView.textStorage?.string, !jsonString.isBlank else { return }
+        // 处理JSON字符串
+        let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
+        let attriStr = NSMutableString(string: trimmedStr)
+        // 处理注释
+        var commentDicts: [String: String] = [:]
+        parseComments(from: trimmedStr, commentDicts: &commentDicts, attriStr: attriStr)
+        do {
             let jsonStr = attriStr
             guard let jsonData = jsonStr.data(using: String.Encoding.utf8.rawValue) else {
-                showAlertInfoWith("warn: input valid json string!", .warning)
+                showAlertInfoWith("警告: 请输入有效的JSON字符串!", .warning)
                 return
             }
-            do {
-                let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
-                guard JSONSerialization.isValidJSONObject(jsonObj) else {
-                    showAlertInfoWith("warn: is not a valid JSON !!!", .warning)
-                    return
-                }
-                saveUserInputContent()
-                updateCodeTheme()
-                if commentDicts.count > 0 {
+            let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
+            guard JSONSerialization.isValidJSONObject(jsonObj) else {
+                showAlertInfoWith("警告: 不是有效的JSON格式!!!", .warning)
+                return
+            }
+            // 保存用户输入内容并更新主题
+            saveUserInputContent()
+            updateCodeTheme()
+            if commentDicts.count > 0 {
+                configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+                builder.commentDicts = commentDicts
+            } else {
+                builder.commentDicts = nil
+                let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
+                if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
                     configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
-                    builder.commentDicts = commentDicts
-                } else {
-                    builder.commentDicts = nil
-                    let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
-                    if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
-                        configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+                }
+            }
+            DispatchQueue.global().async { [weak self] in
+                self?.builder.generateCode(with: jsonObj) { hString, mString in
+                    DispatchQueue.main.async {
+                        self?.handleGeneratedCode(hString, mString)
                     }
                 }
-                DispatchQueue.global().async {
-                    self.builder.generateCode(with: jsonObj) { [weak self] (hString, mString) in
-                        DispatchQueue.main.async {
-                            self?.handleGeneratedCode(hString, mString)
-                        }
-                    }
-                }
-            } catch let error as NSError {
-                print(" error = \(error)")
-                if let errorInfo = error.userInfo["NSDebugDescription"] {
-                    showAlertInfoWith("Invalid json: \(errorInfo)", .warning)
-                }
+            }
+        } catch let error as NSError {
+            print("解析错误 = \(error)")
+            if let errorInfo = error.userInfo["NSDebugDescription"] {
+                showAlertInfoWith("无效的JSON: \(errorInfo)", .warning)
             }
         }
     }
     
+    /// 选择输出文件路径
+    @IBAction func chooseOutputFilePath(_ sender: NSButton) {
+        let openPanel = NSOpenPanel()
+        openPanel.canChooseFiles = false
+        openPanel.canChooseDirectories = true
+        let modal = openPanel.runModal()
+        if modal == .OK {
+            if let fileUrl = openPanel.urls.first {
+                outputFilePath = fileUrl.path
+            }
+        }
+    }
+    
+    // MARK: - 私有方法
+    
+    /// 解析JSON中的注释
+    private func parseComments(from jsonString: String, commentDicts: inout [String: String], attriStr: NSMutableString) {
+        var localCommentDicts = [String: String]()
+        attriStr.enumerateLines { line, _ in
+            guard line.contains("//") else { return }
+            
+            let substrings = line.components(separatedBy: "//")
+            let hasHttpLink = line.contains("http://") || line.contains("https://") || line.contains("://")
+            // 只有图片链接且没注释的情况下不做截断操作
+            let canComment = !(substrings.count == 2 && hasHttpLink)
+            guard canComment else { return }
+            
+            let trimmedLineStr = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            let position = trimmedLineStr.positionOf(sub: "//", backwards: true)
+            if position >= 0 {
+                let linestr = trimmedLineStr.prefix(position)
+                var keystr = String(linestr).trimmingCharacters(in: .whitespacesAndNewlines)
+                let commentstr = trimmedLineStr.suffix(trimmedLineStr.count - position)
+                if keystr.contains(":") {
+                    let lines = keystr.components(separatedBy: ":")
+                    keystr = lines.first ?? ""
+                    keystr = keystr.replacingOccurrences(of: "\"", with: "")
+                    keystr = keystr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let comment = String(commentstr).replacingOccurrences(of: "//", with: "")
+                    localCommentDicts.updateValue(comment, forKey: keystr)
+                }
+                let range = attriStr.range(of: String(commentstr))
+                attriStr.replaceCharacters(in: range, with: "")
+            }
+        }
+        for (key, value) in localCommentDicts {
+            commentDicts[key] = value
+        }
+    }
+    
+    /// 更新代码显示主题
     private func updateCodeTheme() {
         let theme = builder.config.codeType.theme
         let language = builder.config.codeType.language
@@ -226,22 +264,26 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         mTextStorage.language = language
     }
     
-    private func handleGeneratedCode(_ hString:NSMutableString, _ mString:NSMutableString) {
-        var multiplier:CGFloat = 3/5.0
-        if builder.config.codeType == .OC {
-            configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
-        } else if builder.config.codeType == .Swift || builder.config.codeType == .TypeScript  {
+    /// 处理生成的代码
+    private func handleGeneratedCode(_ hString: NSMutableString, _ mString: NSMutableString) {
+        var multiplier: CGFloat = 3/5.0
+        
+        switch builder.config.codeType {
+        case .objectiveC:
+            configJsonTextView(text: mString as String, textView: mTextView, color: codeTextColor)
+        case .swift, .typeScript:
             multiplier = 1.0
-        } else if builder.config.codeType == .Dart {
-            configJsonTextView(text: mString as String , textView: mTextView, color: codeTextColor)
+        case .dart:
+            configJsonTextView(text: mString as String, textView: mTextView, color: codeTextColor)
         }
+        
         hTextViewHeightPriority = modifyConstraint(hTextViewHeightPriority, multiplier)
         configJsonTextView(text: hString as String, textView: hTextView, color: codeTextColor)
         
-        let state = generateFileBtn.state
-        guard state == .on else { return }
+        // 如果开启了生成文件选项，则生成文件
+        guard generateFileBtn.state == .on else { return }
         if let path = outputFilePath {
-            builder.generateFile(with: path, hString: hString, mString: mString) { [weak self] (success, filePath) in
+            builder.generateFile(with: path, hString: hString, mString: mString) { [weak self] success, filePath in
                 if success {
                     self?.showAlertInfoWith("生成文件路径在：\(filePath)", .informational)
                     self?.outputFilePath = filePath
@@ -253,151 +295,187 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         }
     }
     
-    @IBAction func chooseOutputFilePath(_ sender: NSButton) {
-        let openPanel = NSOpenPanel()
-        openPanel.canChooseFiles = false
-        openPanel.canChooseDirectories = true
-        let modal = openPanel.runModal()
-        if modal == .OK {
-            if let fileUrl = openPanel.urls.first{
-                outputFilePath = fileUrl.path
-            }
-        }
-    }
-    
-    // MARK: - Private Method
-    
-    private func modifyConstraint( _ constraint: NSLayoutConstraint?, _ multiplier: CGFloat) -> NSLayoutConstraint? {
-        
+    /// 修改约束
+    private func modifyConstraint(_ constraint: NSLayoutConstraint?, _ multiplier: CGFloat) -> NSLayoutConstraint? {
         guard let constraint = constraint else {
             return nil
         }
+        
         NSLayoutConstraint.deactivate([constraint])
-        let newConstraint = NSLayoutConstraint.init(item: constraint.firstItem as Any, attribute: constraint.firstAttribute, relatedBy: constraint.relation, toItem: constraint.secondItem, attribute: constraint.secondAttribute, multiplier: multiplier, constant: 0)
-        newConstraint.identifier = constraint.identifier;
-        newConstraint.priority = constraint.priority;
-        newConstraint.shouldBeArchived = constraint.shouldBeArchived;
-        NSLayoutConstraint .activate([newConstraint])
+        let newConstraint = NSLayoutConstraint(
+            item: constraint.firstItem as Any,
+            attribute: constraint.firstAttribute,
+            relatedBy: constraint.relation,
+            toItem: constraint.secondItem,
+            attribute: constraint.secondAttribute,
+            multiplier: multiplier,
+            constant: 0
+        )
+        
+        newConstraint.identifier = constraint.identifier
+        newConstraint.priority = constraint.priority
+        newConstraint.shouldBeArchived = constraint.shouldBeArchived
+        
+        NSLayoutConstraint.activate([newConstraint])
         return newConstraint
     }
     
-    private func showAlertInfoWith( _ info: String, _ style:NSAlert.Style) {
+    /// 显示警告或信息
+    private func showAlertInfoWith(_ info: String, _ style: NSAlert.Style) {
         let alert = NSAlert()
         alert.messageText = info
         alert.alertStyle = style
         alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
     }
     
-    /// config ui on main queue.
-    
-    private func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
+    /// 配置文本视图
+    private func configJsonTextView(text: String, textView: NSTextView, color: NSColor) {
         let attrString = NSAttributedString(string: text)
         DispatchQueue.main.async {
             textView.textStorage?.setAttributedString(attrString)
             textView.textStorage?.foregroundColor = .clear
-
         }
     }
     
+    // MARK: - 缓存相关
+    
+    /// 加载用户上次的输入内容
+    private func loadUserLastInputContent() {
+        // URL
+        if let lastUrl = UserDefaults.standard.string(forKey: CacheKeys.lastInputURL) {
+            urlTF.stringValue = lastUrl
+        }
+        
+        // 超类名
+        if let superClassName = UserDefaults.standard.string(forKey: CacheKeys.superClassName) {
+            superClassNameTF.stringValue = superClassName
+        }
+        
+        // 模型名前缀
+        if let modelNamePrefix = UserDefaults.standard.string(forKey: CacheKeys.modelNamePrefix) {
+            modelNamePrefixTF.stringValue = modelNamePrefix
+        }
+        
+        // 根模型名
+        if let rootModelName = UserDefaults.standard.string(forKey: CacheKeys.rootModelName) {
+            rootModelNameTF.stringValue = rootModelName
+        }
+        
+        // 作者名
+        if let authorName = UserDefaults.standard.string(forKey: CacheKeys.authorName) {
+            authorNameTF.stringValue = authorName
+        }
+        
+        // 输出文件路径
+        if let outFilePath = UserDefaults.standard.string(forKey: CacheKeys.generateFilePath) {
+            outputFilePath = outFilePath
+        }
+        
+        // 代码类型
+        let codeTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.buildCodeType)
+        if codeTypeIndex > 0 && codeTypeIndex <= SKCodeType.allCases.count {
+            builder.config.codeType = SKCodeType.allCases[codeTypeIndex - 1]
+            codeTypeBtn.selectItem(at: codeTypeIndex - 1)
+        }
+        
+        // JSON模型类型
+        let jsonTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.supportJSONModelType)
+        if jsonTypeIndex >= 0 && jsonTypeIndex < SKJSONModelType.allCases.count {
+            builder.config.jsonType = SKJSONModelType.allCases[jsonTypeIndex]
+            jsonTypeBtn.selectItem(at: jsonTypeIndex)
+        }
+        
+        // 是否生成文件
+        generateFileBtn.state = UserDefaults.standard.bool(forKey: CacheKeys.shouldGenerateFile) ? .on : .off
+        
+        // 是否生成注释
+        generateComment.state = UserDefaults.standard.bool(forKey: CacheKeys.shouldGenerateComment) ? .on : .off
+    }
+    
+    /// 保存用户输入内容
+    private func saveUserInputContent() {
+        // 代码类型
+        let codeTypeIndex = codeTypeBtn.indexOfSelectedItem
+        if codeTypeIndex >= 0 && codeTypeIndex < SKCodeType.allCases.count {
+            builder.config.codeType = SKCodeType.allCases[codeTypeIndex]
+            UserDefaults.standard.set(codeTypeIndex + 1, forKey: CacheKeys.buildCodeType)
+        }
+        
+        // 父类名
+        var superClassName = ""
+        if builder.config.codeType == .dart || builder.config.codeType == .typeScript {
+            superClassName = superClassNameTF.stringValue
+        } else {
+            superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
+        }
+        UserDefaults.standard.setValue(superClassName, forKey: CacheKeys.superClassName)
+        builder.config.superClassName = superClassName
+        
+        // 类名前缀
+        let modelNamePrefix = modelNamePrefixTF.stringValue.isBlank ? "" : modelNamePrefixTF.stringValue
+        UserDefaults.standard.setValue(modelNamePrefix, forKey: CacheKeys.modelNamePrefix)
+        builder.config.modelNamePrefix = modelNamePrefix
+        
+        // RootModel
+        let rootModelName = rootModelNameTF.stringValue.isBlank ? "NSRootModel" : rootModelNameTF.stringValue
+        UserDefaults.standard.setValue(rootModelName, forKey: CacheKeys.rootModelName)
+        builder.config.rootModelName = rootModelName
+        
+        // 作者名
+        let authorName = authorNameTF.stringValue.isBlank ? "SKGenerateModelTool" : authorNameTF.stringValue
+        UserDefaults.standard.setValue(authorName, forKey: CacheKeys.authorName)
+        builder.config.authorName = authorName
+        
+        // JSON解析框架类型
+        let jsonTypeIndex = jsonTypeBtn.indexOfSelectedItem
+        if jsonTypeIndex >= 0 && jsonTypeIndex < SKJSONModelType.allCases.count {
+            builder.config.jsonType = SKJSONModelType.allCases[jsonTypeIndex]
+            UserDefaults.standard.set(jsonTypeIndex, forKey: CacheKeys.supportJSONModelType)
+        }
+        
+        // 处理HandyJSON特殊情况
+        if builder.config.superClassName.compare("NSObject") == .orderedSame && builder.config.jsonType == .handyJSON {
+            builder.config.superClassName = "HandyJSON"
+        }
+        
+        UserDefaults.standard.setValue(outputFilePath, forKey: CacheKeys.generateFilePath)
+        UserDefaults.standard.set(generateFileBtn.state == .on, forKey: CacheKeys.shouldGenerateFile)
+        UserDefaults.standard.set(generateComment.state == .on, forKey: CacheKeys.shouldGenerateComment)
+        builder.config.shouldGenerateComment = (generateComment.state == .on)
+    }
+    
     // MARK: - NSControlTextEditingDelegate
-
+    
     func controlTextDidChange(_ obj: Notification) {
-        if let tf =  obj.object {
-            currentInputTF = tf as? NSTextField
+        if let tf = obj.object as? NSTextField {
+            currentInputTF = tf
             NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(caculateInputContentWidth), object: nil)
             self.perform(#selector(caculateInputContentWidth))
         }
     }
     
     @objc private func caculateInputContentWidth() {
-        if let tf =  currentInputTF {
-            let constraints = tf.constraints
-            let attributes = [NSAttributedString.Key.font : tf.font]
-            let string = NSString(string: tf.stringValue)
-            var strWidth = string.boundingRect(with: NSSizeFromCGSize(CGSize(width: Double(Float.greatestFiniteMagnitude), height: 22.0)), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: attributes as [NSAttributedString.Key : Any]).width + 10
-            strWidth = max(strWidth, 114)
-            constraints.forEach { (constraint) in
-                if constraint.firstAttribute == .width {
-                    constraint.constant = strWidth
-                }
+        guard let tf = currentInputTF else { return }
+        
+        let constraints = tf.constraints
+        let attributes = [NSAttributedString.Key.font: tf.font as Any]
+        let string = NSString(string: tf.stringValue)
+        var strWidth = string.boundingRect(
+            with: NSSizeFromCGSize(CGSize(width: Double(Float.greatestFiniteMagnitude), height: 22.0)),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes
+        ).width + 10
+        
+        strWidth = max(strWidth, 114)
+        
+        for constraint in constraints {
+            if constraint.firstAttribute == .width {
+                constraint.constant = strWidth
             }
         }
-    }
-    
-    /// load cache
-    
-    private func loadUserLastInputContent() {
-        
-        if let lastUrl = UserDefaults.standard.string(forKey: LastInputURLCacheKey)  {
-            urlTF.stringValue = lastUrl
-        }
-        if let superClassName = UserDefaults.standard.string(forKey: SuperClassNameCacheKey)  {
-            superClassNameTF.stringValue = superClassName
-        }
-        if let modelNamePrefix = UserDefaults.standard.string(forKey: ModelNamePrefixCacheKey)  {
-            modelNamePrefixTF.stringValue = modelNamePrefix
-        }
-        if let rootModelName = UserDefaults.standard.string(forKey: RootModelNameCacheKey)  {
-            rootModelNameTF.stringValue = rootModelName
-        }
-        if let authorName = UserDefaults.standard.string(forKey: AuthorNameCacheKey)  {
-            authorNameTF.stringValue = authorName
-        }
-        if let outFilePath = UserDefaults.standard.string(forKey: GenerateFilePathCacheKey)  {
-            outputFilePath = outFilePath
-        }
-        builder.config.codeType = SKCodeBuilderCodeType(rawValue: UserDefaults.standard.integer(forKey: BuildCodeTypeCacheKey)) ?? .OC
-        codeTypeBtn.selectItem(at: builder.config.codeType.rawValue - 1)
-        builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: UserDefaults.standard.integer(forKey: SupportJSONModelTypeCacheKey)) ?? .None
-        jsonTypeBtn.selectItem(at: builder.config.jsonType.rawValue)
-        generateFileBtn.state = UserDefaults.standard.bool(forKey: ShouldGenerateFileCacheKey) ? .on : .off
-        generateComment.state = UserDefaults.standard.bool(forKey: ShouldGenerateCommentCacheKey) ? .on : .off
-    }
-    
-    /// save cache
-    
-    private func saveUserInputContent() {
-      
-        builder.config.codeType = SKCodeBuilderCodeType(rawValue: codeTypeBtn.indexOfSelectedItem + 1) ?? .OC
-        UserDefaults.standard.set(codeTypeBtn.indexOfSelectedItem + 1, forKey: BuildCodeTypeCacheKey)
-
-        var superClassName = ""
-        if builder.config.codeType == .Dart || builder.config.codeType == .TypeScript {
-            superClassName = superClassNameTF.stringValue
-        } else {
-            superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
-        }
-        UserDefaults.standard.setValue(superClassName, forKey: SuperClassNameCacheKey)
-        builder.config.superClassName = superClassName
-
-        let modelNamePrefix = modelNamePrefixTF.stringValue.isBlank ? "" : modelNamePrefixTF.stringValue
-        UserDefaults.standard.setValue(modelNamePrefix, forKey: ModelNamePrefixCacheKey)
-        builder.config.modelNamePrefix = modelNamePrefix
-
-        let rootModelName = rootModelNameTF.stringValue.isBlank ? "NSRootModel" : rootModelNameTF.stringValue
-        UserDefaults.standard.setValue(rootModelName, forKey: RootModelNameCacheKey)
-        builder.config.rootModelName = rootModelName
-        
-        let authorName = authorNameTF.stringValue.isBlank ? "SKGenerateModelTool" : authorNameTF.stringValue
-        UserDefaults.standard.setValue(authorName, forKey: AuthorNameCacheKey)
-        builder.config.authorName = authorName
-        
-        builder.config.jsonType = SKCodeBuilderJSONModelType(rawValue: jsonTypeBtn.indexOfSelectedItem)!
-        UserDefaults.standard.set(jsonTypeBtn.indexOfSelectedItem, forKey: SupportJSONModelTypeCacheKey)
-
-        if builder.config.superClassName.compare("NSObject") == .orderedSame {
-            if builder.config.jsonType == .HandyJSON {
-                builder.config.superClassName = "HandyJSON"
-            }
-        }
-        UserDefaults.standard.setValue(outputFilePath, forKey: GenerateFilePathCacheKey)
-        UserDefaults.standard.set(generateFileBtn.state == .on , forKey: ShouldGenerateFileCacheKey)
-        UserDefaults.standard.set(generateComment.state == .on , forKey: ShouldGenerateCommentCacheKey)
-        builder.config.shouldGenerateComment = (generateComment.state == .on)
     }
     
     override var representedObject: Any? {
-        didSet { }
+        didSet {}
     }
 }
-

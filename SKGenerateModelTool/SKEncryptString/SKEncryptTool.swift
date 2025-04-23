@@ -66,7 +66,7 @@ class SKEncryptTool: NSObject {
         value.append("0")
         
         let hString = NSMutableString()
-        let varName = str._adler32()
+        let varName = str.checksum()
         hString.append("/** \(str) */\n")
         hString.append("extern const SKEncryptString * const \(varName);\n")
         
