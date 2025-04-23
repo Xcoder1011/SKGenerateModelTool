@@ -9,29 +9,28 @@
 import Cocoa
 
 class EncryptionController: NSViewController {
-
     let UseKeyBtnSelectStateCacheKey = "UseKeyBtnSelectStateCacheKey"
     let CipherContentCacheKey = "CipherContentCacheKey"
     
     @IBOutlet var inputTextView: NSTextView!
     @IBOutlet var hTextView: NSTextView!
     @IBOutlet var mTextView: NSTextView!
-    @IBOutlet weak var useKeyBtn: NSButton!
-    @IBOutlet weak var keyTF: NSTextField!
+    @IBOutlet var useKeyBtn: NSButton!
+    @IBOutlet var keyTF: NSTextField!
     
     lazy var inputTextColor = NSColor.blue
-    lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0 , blue: 143/255.0, alpha: 1.0)
+    lazy var codeTextColor = NSColor(red: 215/255.0, green: 0/255.0, blue: 143/255.0, alpha: 1.0)
 
     @IBAction func encryptString(_ sender: NSButton) {
         if let inputString = inputTextView.textStorage?.string {
             let state = useKeyBtn.state
-            UserDefaults.standard.set(state == .on , forKey: UseKeyBtnSelectStateCacheKey)
+            UserDefaults.standard.set(state == .on, forKey: UseKeyBtnSelectStateCacheKey)
             let key = state == .on ? keyTF.stringValue : nil
             UserDefaults.standard.setValue(key, forKey: CipherContentCacheKey)
             let tempStr = inputString.replacingOccurrences(of: " ", with: "")
             if tempStr.isBlank { return }
             configJsonTextView(text: inputString, textView: inputTextView, color: inputTextColor)
-            SKEncryptTool.encryptString(str: inputString, key: key) {[weak self] (hStr, mStr) in
+            SKEncryptTool.encryptString(str: inputString, key: key) { [weak self] hStr, mStr in
                 let hstring = hStr.substring(to: hStr.length)
                 self?.configJsonTextView(text: hstring, textView: self!.hTextView, color: (self?.codeTextColor)!)
                 let mstring = mStr.substring(to: mStr.length)
@@ -60,7 +59,7 @@ class EncryptionController: NSViewController {
     
     /// config ui on main queue.
     
-    private func configJsonTextView(text:String, textView:NSTextView, color:NSColor) {
+    private func configJsonTextView(text: String, textView: NSTextView, color: NSColor) {
         let attrString = NSAttributedString(string: text)
         DispatchQueue.main.async {
             textView.textStorage?.setAttributedString(attrString)
@@ -73,7 +72,7 @@ class EncryptionController: NSViewController {
         super.viewDidLoad()
         
         useKeyBtn.state = UserDefaults.standard.bool(forKey: UseKeyBtnSelectStateCacheKey) ? .on : .off
-        if let key = UserDefaults.standard.string(forKey: CipherContentCacheKey)  {
+        if let key = UserDefaults.standard.string(forKey: CipherContentCacheKey) {
             keyTF.stringValue = key
         }
         

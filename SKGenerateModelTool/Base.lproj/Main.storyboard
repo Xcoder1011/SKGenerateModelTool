@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -712,9 +712,6 @@
                         <subviews>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="scV-l8-Ulq">
                                 <rect key="frame" x="7" y="680" width="78" height="26"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="Iak-d9-Pcr"/>
-                                </constraints>
                                 <popUpButtonCell key="cell" type="push" title="GET" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="75M-fi-ZHS" id="hKV-sl-Mcl">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -726,8 +723,11 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="Iak-d9-Pcr"/>
+                                </constraints>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i1u-oJ-SnE">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i1u-oJ-SnE">
                                 <rect key="frame" x="91" y="683" width="1139" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="P2c-kE-za5"/>
@@ -740,34 +740,34 @@
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cz8-VV-Oju">
                                 <rect key="frame" x="1240" y="682" width="80" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="25" id="G5e-UU-tfl"/>
-                                </constraints>
                                 <buttonCell key="cell" type="squareTextured" title="Send" bezelStyle="texturedSquare" image="confirm" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="nb0-E6-rEK">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="15" name="ArialRoundedMTBold"/>
                                 </buttonCell>
                                 <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="G5e-UU-tfl"/>
+                                </constraints>
                                 <connections>
                                     <action selector="requestURLBtnClicked:" target="LHr-yW-btL" id="uh4-Ee-owB"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IZJ-nR-Rro">
                                 <rect key="frame" x="1240" y="7" width="80" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="25" id="bFe-SZ-An1"/>
-                                    <constraint firstAttribute="width" constant="80" id="www-Xz-oiy"/>
-                                </constraints>
                                 <buttonCell key="cell" type="squareTextured" title="MAKE" bezelStyle="texturedSquare" image="confirm" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="1dk-kj-4MU">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="14" name="ArialRoundedMTBold"/>
                                 </buttonCell>
                                 <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="bFe-SZ-An1"/>
+                                    <constraint firstAttribute="width" constant="80" id="www-Xz-oiy"/>
+                                </constraints>
                                 <connections>
                                     <action selector="startMakeCode:" target="LHr-yW-btL" id="7N9-BI-3Yh"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zmG-Je-iVh">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zmG-Je-iVh">
                                 <rect key="frame" x="10" y="9" width="114" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="S6A-WW-t8I"/>
@@ -782,7 +782,7 @@
                                     <outlet property="delegate" destination="LHr-yW-btL" id="oJS-yD-f2a"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nTG-cr-Yu8">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nTG-cr-Yu8">
                                 <rect key="frame" x="129" y="9" width="114" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="4CQ-Sd-AZN"/>
@@ -797,13 +797,13 @@
                                     <outlet property="delegate" destination="LHr-yW-btL" id="YqU-F3-Khe"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SMd-wO-dqp">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SMd-wO-dqp">
                                 <rect key="frame" x="248" y="9" width="114" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="114" id="EdR-Dv-SBp"/>
                                     <constraint firstAttribute="height" constant="22" id="Kst-gw-Tdt"/>
                                 </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" placeholderString="父类名" drawsBackground="YES" id="ZlQ-CR-2gE">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" placeholderString="父类名/协议名" drawsBackground="YES" id="ZlQ-CR-2gE">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -927,7 +927,7 @@
                                     <constraint firstItem="xHi-uk-b2j" firstAttribute="leading" secondItem="Fpx-8b-qZn" secondAttribute="trailing" constant="2" id="yxj-ZE-nOO"/>
                                 </constraints>
                             </customView>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="svt-HM-ZGk">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="svt-HM-ZGk">
                                 <rect key="frame" x="367" y="9" width="114" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="Vd0-OK-jer"/>
@@ -944,9 +944,6 @@
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4t2-ao-Tp6">
                                 <rect key="frame" x="493" y="6" width="111" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="104" id="VDy-LS-S3v"/>
-                                </constraints>
                                 <popUpButtonCell key="cell" type="push" title="Objective-C" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="GSX-bs-70k" id="7mh-Hs-JVH">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -958,12 +955,12 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="104" id="VDy-LS-S3v"/>
+                                </constraints>
                             </popUpButton>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oyY-SX-ZBr">
                                 <rect key="frame" x="612" y="6" width="111" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="104" id="FsR-JY-ipv"/>
-                                </constraints>
                                 <popUpButtonCell key="cell" type="push" title="None" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="fPn-IU-Oze" id="0sb-de-7Bl">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -975,6 +972,9 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="104" id="FsR-JY-ipv"/>
+                                </constraints>
                             </popUpButton>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cvJ-dR-lbU">
                                 <rect key="frame" x="727" y="3" width="114" height="32"/>
@@ -995,14 +995,14 @@
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZLe-3F-H6c">
                                 <rect key="frame" x="1028" y="0.0" width="144" height="37"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="130" id="kLz-nn-XPf"/>
-                                    <constraint firstAttribute="height" constant="25" id="qCe-c6-Kgq"/>
-                                </constraints>
                                 <buttonCell key="cell" type="push" title="Encryption(加密)" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="duT-Js-07P">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="130" id="kLz-nn-XPf"/>
+                                    <constraint firstAttribute="height" constant="25" id="qCe-c6-Kgq"/>
+                                </constraints>
                                 <connections>
                                     <segue destination="iSi-pm-rOd" kind="show" id="UKv-G4-Acc"/>
                                 </connections>
@@ -1154,7 +1154,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
-                                    <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="RBP-Sz-MSH">
+                                    <button tag="100" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RBP-Sz-MSH">
                                         <rect key="frame" x="1038" y="458" width="60" height="32"/>
                                         <buttonCell key="cell" type="push" title="COPY" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pIl-tQ-AqU">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1199,7 +1199,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
-                                    <button verticalHuggingPriority="750" tag="101" translatesAutoresizingMaskIntoConstraints="NO" id="g1Z-xu-BWU">
+                                    <button tag="101" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g1Z-xu-BWU">
                                         <rect key="frame" x="1038" y="48" width="60" height="32"/>
                                         <buttonCell key="cell" type="push" title="COPY" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZbH-2C-jAK">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1209,8 +1209,8 @@
                                             <action selector="copyCodeString:" target="iSi-pm-rOd" id="NFh-UP-eKj"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="igO-9f-i1a">
-                                        <rect key="frame" x="121" y="10" width="985" height="26"/>
+                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="igO-9f-i1a">
+                                        <rect key="frame" x="111" y="10" width="995" height="26"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="26" id="Pae-Fi-wJ0"/>
                                         </constraints>
@@ -1221,7 +1221,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="axs-sD-NhY">
-                                        <rect key="frame" x="-2" y="14" width="115" height="18"/>
+                                        <rect key="frame" x="-2" y="14" width="105" height="18"/>
                                         <buttonCell key="cell" type="check" title="  KEY（密钥）:" bezelStyle="regularSquare" imagePosition="left" inset="2" id="rMc-JY-7oZ">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -1252,7 +1252,7 @@
                                     <constraint firstItem="XwF-hm-wdn" firstAttribute="leading" secondItem="hB0-CX-8FZ" secondAttribute="trailing" constant="2" id="vjl-JF-nNk"/>
                                 </constraints>
                             </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Efx-0X-Zw5">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Efx-0X-Zw5">
                                 <rect key="frame" x="8" y="630" width="211" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Please enter the string to encrypt:" id="Uzt-ls-iPw">
                                     <font key="font" metaFont="system"/>
@@ -1260,8 +1260,8 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-aR-fLj">
-                                <rect key="frame" x="450" y="630" width="115" height="16"/>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-aR-fLj">
+                                <rect key="frame" x="450" y="630" width="111" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Encrypted string：" id="rHk-tq-ZH1">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1270,15 +1270,15 @@
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fqX-Xd-yh1">
                                 <rect key="frame" x="1036" y="625" width="80" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="80" id="CYd-11-n04"/>
-                                    <constraint firstAttribute="height" constant="25" id="ud0-7Q-EmC"/>
-                                </constraints>
                                 <buttonCell key="cell" type="squareTextured" title="ENCRYPT" bezelStyle="texturedSquare" image="confirm" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="joz-0X-uEZ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="14" name="ArialRoundedMTBold"/>
                                 </buttonCell>
                                 <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="CYd-11-n04"/>
+                                    <constraint firstAttribute="height" constant="25" id="ud0-7Q-EmC"/>
+                                </constraints>
                                 <connections>
                                     <action selector="encryptString:" target="iSi-pm-rOd" id="Mtz-ut-tXx"/>
                                 </connections>

@@ -30,6 +30,5 @@ public class SKCodeBuilderConfig {
     /// 是否生成注释
     var shouldGenerateComment = false
     
-    /// 初始化方法
     public init() {}
-} 
+}

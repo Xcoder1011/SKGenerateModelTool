@@ -13,27 +13,27 @@ extension SKModelGenerator {
         if config.codeType == .objectiveC {
             if key.isEmpty { // Root model
                 if config.jsonType == .yyModel, config.superClassName.compare("NSObject") == .orderedSame {
-                    hString.append("\n@interface \(config.rootModelName) : \(config.superClassName) <YYModel>\n")
+                    hString.append("\n@interface \(config.rootModelName): \(config.superClassName) <YYModel>\n")
                 } else {
-                    hString.append("\n@interface \(config.rootModelName) : \(config.superClassName)\n")
+                    hString.append("\n@interface \(config.rootModelName): \(config.superClassName)\n")
                 }
                 mString.append("\n@implementation \(config.rootModelName)\n")
             } else { // sub model
                 let modelName = modelClassName(with: key)
                 hString.insert("@class \(modelName);\n", at: 0)
                 if config.jsonType == .yyModel, config.superClassName.compare("NSObject") == .orderedSame {
-                    hString.append("\n@interface \(modelName) : \(config.superClassName) <YYModel>\n")
+                    hString.append("\n@interface \(modelName): \(config.superClassName) <YYModel>\n")
                 } else {
-                    hString.append("\n@interface \(modelName) : \(config.superClassName)\n")
+                    hString.append("\n@interface \(modelName): \(config.superClassName)\n")
                 }
                 mString.append("\n@implementation \(modelName)\n")
             }
         } else if config.codeType == .swift {
             if key.isEmpty { // Root model
-                hString.append("\nclass \(config.rootModelName) : \(config.superClassName) {\n")
+                hString.append("\nstruct \(config.rootModelName): \(config.superClassName) {\n")
             } else { // sub model
                 let modelName = modelClassName(with: key)
-                hString.append("\nclass \(modelName) : \(config.superClassName) {\n")
+                hString.append("\nstruct \(modelName): \(config.superClassName) {\n")
             }
         } else if config.codeType == .dart {
             var modelName = config.rootModelName
@@ -150,7 +150,7 @@ extension SKModelGenerator {
             case .objectiveC:
                 hString.append("\(ocCommentName(key, "\(intValue)"))@property (nonatomic, assign) NSInteger itemId;\n")
             case .swift:
-                hString.append("    var itemId: Int = 0  \(singlelineCommentName(key, "\(intValue)"))\n")
+                hString.append("    var itemId: Int = 0 \(singlelineCommentName(key, "\(intValue)"))\n")
             case .dart:
                 hString.append("   int? itemId;  \(singlelineCommentName(key, "\(intValue)"))\n")
                 generateDartIntJsonParsing(key: "itemId", hString: hString)
@@ -162,7 +162,7 @@ extension SKModelGenerator {
             case .objectiveC:
                 hString.append("\(ocCommentName(key, "\(intValue)"))@property (nonatomic, assign) NSInteger \(key);\n")
             case .swift:
-                hString.append("    var \(key): Int = 0  \(singlelineCommentName(key, "\(intValue)"))\n")
+                hString.append("    var \(key): Int = 0 \(singlelineCommentName(key, "\(intValue)"))\n")
             case .dart:
                 hString.append("   int? \(key);  \(singlelineCommentName(key, "\(intValue)"))\n")
                 generateDartIntJsonParsing(key: key, hString: hString)
@@ -181,7 +181,7 @@ extension SKModelGenerator {
             case .objectiveC:
                 hString.append("\(ocCommentName(key, idValue))@property (nonatomic, copy) NSString *itemId;\n")
             case .swift:
-                hString.append("    var itemId: String?  \(commentName(key, idValue))\n")
+                hString.append("    var itemId: String? \(singlelineCommentName(key, idValue))\n")
             case .dart:
                 hString.append("   String? \(key);  \(singlelineCommentName(key, idValue))\n")
                 generateDartStringJsonParsing(key: key, hString: hString)
@@ -194,9 +194,9 @@ extension SKModelGenerator {
                 hString.append("\(ocCommentName(key, idValue))@property (nonatomic, copy) NSString *\(key);\n")
             case .swift:
                 if idValue.count > 12 {
-                    hString.append("    var \(key): String?  \(commentName(key, idValue, false))\n")
+                    hString.append("    var \(key): String? \(singlelineCommentName(key, idValue, false))\n")
                 } else {
-                    hString.append("    var \(key): String?  \(commentName(key, idValue))\n")
+                    hString.append("    var \(key): String? \(singlelineCommentName(key, idValue))\n")
                 }
             case .dart:
                 hString.append("   String? \(key);  \(singlelineCommentName(key, idValue))\n")
@@ -213,7 +213,7 @@ extension SKModelGenerator {
         case .objectiveC:
             hString.append("\(ocCommentName(key, "<#泛型#>"))@property (nonatomic, strong) id \(key);\n")
         case .swift:
-            hString.append("    var \(key): Any?  \(singlelineCommentName(key, "<#泛型#>"))\n")
+            hString.append("    var \(key): Any? \(singlelineCommentName(key, "<#泛型#>"))\n")
         case .dart:
             hString.append("   dynamic? \(key);  \(singlelineCommentName(key, "<#泛型#>"))\n")
             
@@ -446,7 +446,7 @@ private extension SKModelGenerator {
         case .objectiveC:
             hString.append("\(ocCommentName(key, "\(numValue)"))@property (nonatomic, assign) CGFloat \(key);\n")
         case .swift:
-            hString.append("    var \(key): Double?  \(singlelineCommentName(key, "\(numValue)"))\n")
+            hString.append("    var \(key): Double? \(singlelineCommentName(key, "\(numValue)"))\n")
         case .dart:
             hString.append("   double? \(key);  \(singlelineCommentName(key, "\(numValue)"))\n")
             
@@ -477,7 +477,7 @@ private extension SKModelGenerator {
         case .objectiveC:
             hString.append("\(ocCommentName(key, "\(numValue)"))@property (nonatomic, assign) BOOL \(key);\n")
         case .swift:
-            hString.append("    var \(key): Bool = false  \(singlelineCommentName(key, numValue.boolValue == true ? "true" : "false"))\n")
+            hString.append("    var \(key): Bool = false \(singlelineCommentName(key, numValue.boolValue == true ? "true" : "false"))\n")
         case .dart:
             hString.append("   bool? \(key);  \(singlelineCommentName(key, numValue.boolValue == true ? "true" : "false"))\n")
             let fString =
@@ -520,18 +520,18 @@ private extension SKModelGenerator {
     func handleSwiftArrayValue(firstObject: Any, key: String, hString: NSMutableString) {
         if firstObject is String {
             // String 类型
-            hString.append("    var \(key): [String]?  \(singlelineCommentName(key, "", false))\n")
+            hString.append("    var \(key): [String]? \(singlelineCommentName(key, "", false))\n")
         } else if firstObject is [String: Any] {
             // Dictionary 类型
             let key = handleMaybeSameKey(key)
             let modeName = modelClassName(with: key)
             handleDicts[key] = firstObject
-            hString.append("    var \(key): [\(modeName)]?  \(singlelineCommentName(key, "", false))\n")
+            hString.append("    var \(key): [\(modeName)]? \(singlelineCommentName(key, "", false))\n")
         } else if let nestedArray = firstObject as? [Any] {
             // Array 类型
             handleArrayValue(arrayValue: nestedArray, key: key, hString: hString)
         } else {
-            hString.append("    var \(key): [Any]?  \(singlelineCommentName(key, "", false))\n")
+            hString.append("    var \(key): [Any]? \(singlelineCommentName(key, "", false))\n")
         }
     }
     

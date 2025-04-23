@@ -405,6 +405,8 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         var superClassName = ""
         if builder.config.codeType == .dart || builder.config.codeType == .typeScript {
             superClassName = superClassNameTF.stringValue
+        } else if builder.config.codeType == .swift {
+            superClassName = superClassNameTF.stringValue.isBlank ? "Codable" : superClassNameTF.stringValue
         } else {
             superClassName = superClassNameTF.stringValue.isBlank ? "NSObject" : superClassNameTF.stringValue
         }
@@ -417,7 +419,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         builder.config.modelNamePrefix = modelNamePrefix
         
         // RootModel
-        let rootModelName = rootModelNameTF.stringValue.isBlank ? "NSRootModel" : rootModelNameTF.stringValue
+        let rootModelName = rootModelNameTF.stringValue.isBlank ? "RootModel" : rootModelNameTF.stringValue
         UserDefaults.standard.setValue(rootModelName, forKey: CacheKeys.rootModelName)
         builder.config.rootModelName = rootModelName
         

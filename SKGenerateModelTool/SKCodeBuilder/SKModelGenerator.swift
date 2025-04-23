@@ -25,7 +25,7 @@ class SKModelGenerator {
     var toJsonString = NSMutableString()
     
     var fileType: String {
-        return config.codeType.fileExtension
+        config.codeType.fileExtension
     }
     
     init(config: SKCodeBuilderConfig, commentDicts: [String: String]?) {
