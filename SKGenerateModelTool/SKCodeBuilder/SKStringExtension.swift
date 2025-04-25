@@ -11,37 +11,31 @@ import zlib
 extension String {
     /// 判断字符串是否为空
     var isBlank: Bool {
-        let trimmedStr = self.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedStr.isEmpty
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     /// URL编码
     func urlEncoding() -> String {
-        if self.isBlank { return self }
-        if let encodeUrl = self.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) {
-            return encodeUrl
-        }
-        return self
+        guard !self.isBlank else { return self }
+        return self.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? self
     }
     
     /// 字符串转JSON对象
     func toJsonObject() -> Any? {
-        if self.isBlank { return nil }
-        if let jsonData = self.data(using: String.Encoding.utf8) {
-            do {
-                let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
-                return jsonObj
-            } catch {
-                print(error)
-            }
+        guard !self.isBlank,
+              let jsonData = self.data(using: .utf8) else { return nil }
+        
+        do {
+            return try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
+        } catch {
+            print(error)
+            return nil
         }
-        return nil
     }
     
     /// 获取子字符串的NSRange
     func nsrangeOf(str: String) -> NSRange {
-        let nsString = NSString(string: self)
-        return nsString.range(of: str)
+        (self as NSString).range(of: str)
     }
     
     /// 将Swift的Range转换为NSRange
@@ -53,57 +47,54 @@ extension String {
     
     /// 在字符串中查找另一字符串首次出现的位置（或最后一次出现位置）
     func positionOf(sub: String, backwards: Bool = false) -> Int {
-        var pos = -1
-        if let range = range(of: sub, options: backwards ? .backwards : .literal, range: nil, locale: nil) {
-            if !range.isEmpty {
-                pos = self.distance(from: startIndex, to: range.lowerBound)
-            }
+        guard let range = range(of: sub, options: backwards ? .backwards : .literal) else {
+            return -1
         }
-        return pos
+        return self.distance(from: startIndex, to: range.lowerBound)
     }
     
     /// 计算字符串的Adler32和CRC32值
     func checksum() -> String {
-        if self.isBlank { return self }
+        guard !self.isBlank, let data = self.data(using: .utf8) else { return self }
+        
+        let nData = NSData(data: data)
         var crc = crc32(0, nil, 0)
-        if let data = self.data(using: .utf8) {
-            let nData = NSData(data: data)
-            crc = crc32(crc, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count), uInt(data.count))
-            var adler = adler32(0, nil, 0)
-            adler = adler32(adler, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count), uInt(data.count))
-            return "_\(adler ^ crc)"
-        }
-        return self
+        crc = crc32(crc, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count), uInt(data.count))
+        
+        var adler = adler32(0, nil, 0)
+        adler = adler32(adler, nData.bytes.bindMemory(to: UInt8.self, capacity: data.count), uInt(data.count))
+        
+        return "_\(adler ^ crc)"
     }
     
     /// 驼峰转下划线
     var underscore_name: String {
+        guard !self.isBlank else { return "" }
+        
         var name = ""
-        if self.isBlank { return "" }
         var upperword = ""
         var canAdd = false
         
         for character in self {
-            if character.isUppercase { // 大写
+            if character.isUppercase {
                 if canAdd {
                     name.append("_\(character.lowercased())")
                 } else {
                     name.append("\(character.lowercased())")
                     upperword.append(character)
                 }
-            } else { // 小写
-                if !name.contains("_") {
-                    if upperword.count > 1 {
-                        let frontString = (name as NSString).substring(to: upperword.count - 1)
-                        let lastString = (name as NSString).substring(from: upperword.count - 1)
-                        name.removeAll()
-                        name.append("\(frontString)_\(lastString)")
-                    }
+            } else {
+                if !name.contains("_") && upperword.count > 1 {
+                    let nsString = name as NSString
+                    let frontString = nsString.substring(to: upperword.count - 1)
+                    let lastString = nsString.substring(from: upperword.count - 1)
+                    name = "\(frontString)_\(lastString)"
                 }
                 name.append(character)
                 canAdd = true
             }
         }
+        
         return name
     }
 }

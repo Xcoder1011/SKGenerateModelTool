@@ -110,95 +110,133 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     @IBAction func requestURLBtnClicked(_ sender: NSButton) {
         updateCodeTheme()
         var urlString = urlTF.stringValue
-        if urlString.isBlank { return }
+        guard !urlString.isBlank else { return }
+        
         urlString = urlString.urlEncoding()
         UserDefaults.standard.setValue(urlString, forKey: CacheKeys.lastInputURL)
         
-        let session = URLSession.shared
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: urlString) else {
+            showAlertInfoWith("无效的URL格式", .warning)
+            return
+        }
+        
+        Task {
+            do {
+                let jsonString = try await fetchJsonData(from: url)
+                configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+            } catch {
+                showAlertInfoWith("请求失败: \(error.localizedDescription)", .warning)
+            }
+        }
+    }
+    
+    /// 使用async/await获取JSON数据
+    private func fetchJsonData(from url: URL) async throws -> String {
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
         
         // 处理POST请求
         if reqTypeBtn.indexOfSelectedItem == 1 {
-            if let query = url.query {
-                var urlWithoutQuery = urlString.replacingOccurrences(of: query, with: "")
-                if urlWithoutQuery.hasSuffix("?") {
-                    urlWithoutQuery.removeLast()
-                }
-                if let newUrl = URL(string: urlWithoutQuery) {
-                    request = URLRequest(url: newUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-                    if let httpBody = query.data(using: .utf8) {
-                        request.httpBody = httpBody
-                    }
-                }
-            }
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "POST"
+            request = try configurePostRequest(originalUrl: url)
         }
         
-        let task = session.dataTask(with: request) { [weak self] data, _, error in
-            guard let data = data, error == nil else { return }
-            do {
-                let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-                if JSONSerialization.isValidJSONObject(jsonObj) {
-                    let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
-                    if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
-                        DispatchQueue.main.async {
-                            self?.configJsonTextView(text: jsonString, textView: self!.jsonTextView, color: NSColor.blue)
-                        }
-                    }
-                }
-            } catch {
-                print("JSON解析错误 = \(error)")
-            }
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+        
+        guard JSONSerialization.isValidJSONObject(jsonObj) else {
+            throw NSError(domain: "JSONError", code: 1, userInfo: [NSLocalizedDescriptionKey: "无效的JSON响应"])
         }
-        task.resume()
+        
+        let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
+        guard let jsonString = String(data: formatJsonData, encoding: .utf8) else {
+            throw NSError(domain: "JSONError", code: 2, userInfo: [NSLocalizedDescriptionKey: "无法将JSON数据转换为字符串"])
+        }
+        
+        return jsonString
+    }
+    
+    /// 配置POST请求
+    private func configurePostRequest(originalUrl: URL) throws -> URLRequest {
+        guard let query = originalUrl.query else {
+            return URLRequest(url: originalUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+        }
+        
+        let urlString = originalUrl.absoluteString
+        var urlWithoutQuery = urlString.replacingOccurrences(of: query, with: "")
+        if urlWithoutQuery.hasSuffix("?") {
+            urlWithoutQuery.removeLast()
+        }
+        
+        guard let newUrl = URL(string: urlWithoutQuery) else {
+            throw NSError(domain: "URLError", code: 3, userInfo: [NSLocalizedDescriptionKey: "无法创建不带查询参数的URL"])
+        }
+        
+        var request = URLRequest(url: newUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpBody = query.data(using: .utf8)
+        
+        return request
     }
     
     /// 开始生成代码
     @IBAction func startMakeCode(_ sender: NSButton) {
         guard let jsonString = jsonTextView.textStorage?.string, !jsonString.isBlank else { return }
+        
         // 处理JSON字符串
         let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
         let attriStr = NSMutableString(string: trimmedStr)
+        
         // 处理注释
         var commentDicts: [String: String] = [:]
         parseComments(from: trimmedStr, commentDicts: &commentDicts, attriStr: attriStr)
+        
         do {
-            let jsonStr = attriStr
-            guard let jsonData = jsonStr.data(using: String.Encoding.utf8.rawValue) else {
+            guard let jsonData = attriStr.data(using: String.Encoding.utf8.rawValue) else {
                 showAlertInfoWith("警告: 请输入有效的JSON字符串!", .warning)
                 return
             }
+            
             let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
             guard JSONSerialization.isValidJSONObject(jsonObj) else {
                 showAlertInfoWith("警告: 不是有效的JSON格式!!!", .warning)
                 return
             }
+            
             // 保存用户输入内容并更新主题
             saveUserInputContent()
             updateCodeTheme()
-            if commentDicts.count > 0 {
+            
+            if !commentDicts.isEmpty {
                 configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
                 builder.commentDicts = commentDicts
             } else {
                 builder.commentDicts = nil
                 let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
-                if let jsonString = String(data: formatJsonData, encoding: String.Encoding.utf8) {
-                    configJsonTextView(text: jsonString, textView: jsonTextView, color: NSColor.blue)
+                if let formattedJsonString = String(data: formatJsonData, encoding: .utf8) {
+                    configJsonTextView(text: formattedJsonString, textView: jsonTextView, color: NSColor.blue)
                 }
             }
+            
+            Task {
+                await generateModelCode(from: jsonObj)
+            }
+        } catch {
+            print("解析错误 = \(error)")
+            let errorInfo = (error as NSError).userInfo["NSDebugDescription"] as? String ?? error.localizedDescription
+            showAlertInfoWith("无效的JSON: \(errorInfo)", .warning)
+        }
+    }
+    
+    /// 异步生成代码
+    private func generateModelCode(from jsonObj: Any) async {
+        return await withCheckedContinuation { continuation in
             DispatchQueue.global().async { [weak self] in
                 self?.builder.generateCode(with: jsonObj) { hString, mString in
                     DispatchQueue.main.async {
                         self?.handleGeneratedCode(hString, mString)
+                        continuation.resume()
                     }
                 }
-            }
-        } catch let error as NSError {
-            print("解析错误 = \(error)")
-            if let errorInfo = error.userInfo["NSDebugDescription"] {
-                showAlertInfoWith("无效的JSON: \(errorInfo)", .warning)
             }
         }
     }
@@ -216,10 +254,47 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         }
     }
     
-    // MARK: - 私有方法
+    @objc private func caculateInputContentWidth() {
+        guard let tf = currentInputTF else { return }
+        
+        let constraints = tf.constraints
+        let attributes = [NSAttributedString.Key.font: tf.font as Any]
+        let string = NSString(string: tf.stringValue)
+        var strWidth = string.boundingRect(
+            with: NSSizeFromCGSize(CGSize(width: Double(Float.greatestFiniteMagnitude), height: 22.0)),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes
+        ).width + 10
+        
+        strWidth = max(strWidth, 114)
+        
+        for constraint in constraints {
+            if constraint.firstAttribute == .width {
+                constraint.constant = strWidth
+            }
+        }
+    }
     
+    // MARK: - NSControlTextEditingDelegate
+    
+    func controlTextDidChange(_ obj: Notification) {
+        if let tf = obj.object as? NSTextField {
+            currentInputTF = tf
+            NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(caculateInputContentWidth), object: nil)
+            self.perform(#selector(caculateInputContentWidth))
+        }
+    }
+    
+    override var representedObject: Any? {
+        didSet {}
+    }
+}
+
+// MARK: - Private Method
+
+private extension ViewController {
     /// 解析JSON中的注释
-    private func parseComments(from jsonString: String, commentDicts: inout [String: String], attriStr: NSMutableString) {
+    func parseComments(from jsonString: String, commentDicts: inout [String: String], attriStr: NSMutableString) {
         var localCommentDicts = [String: String]()
         attriStr.enumerateLines { line, _ in
             guard line.contains("//") else { return }
@@ -254,7 +329,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     /// 更新代码显示主题
-    private func updateCodeTheme() {
+    func updateCodeTheme() {
         let theme = builder.config.codeType.theme
         let language = builder.config.codeType.language
         jsonTextStorage.highlightr.setTheme(to: theme)
@@ -265,7 +340,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     /// 处理生成的代码
-    private func handleGeneratedCode(_ hString: NSMutableString, _ mString: NSMutableString) {
+    func handleGeneratedCode(_ hString: NSMutableString, _ mString: NSMutableString) {
         var multiplier: CGFloat = 3/5.0
         
         switch builder.config.codeType {
@@ -296,32 +371,28 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     /// 修改约束
-    private func modifyConstraint(_ constraint: NSLayoutConstraint?, _ multiplier: CGFloat) -> NSLayoutConstraint? {
-        guard let constraint = constraint else {
-            return nil
-        }
-        
-        NSLayoutConstraint.deactivate([constraint])
+    func modifyConstraint(_ constraint: NSLayoutConstraint?, _ multiplier: CGFloat) -> NSLayoutConstraint? {
+        guard let oldConstraint = constraint else { return nil }
         let newConstraint = NSLayoutConstraint(
-            item: constraint.firstItem as Any,
-            attribute: constraint.firstAttribute,
-            relatedBy: constraint.relation,
-            toItem: constraint.secondItem,
-            attribute: constraint.secondAttribute,
+            item: oldConstraint.firstItem as Any,
+            attribute: oldConstraint.firstAttribute,
+            relatedBy: oldConstraint.relation,
+            toItem: oldConstraint.secondItem,
+            attribute: oldConstraint.secondAttribute,
             multiplier: multiplier,
-            constant: 0
+            constant: oldConstraint.constant
         )
-        
-        newConstraint.identifier = constraint.identifier
-        newConstraint.priority = constraint.priority
-        newConstraint.shouldBeArchived = constraint.shouldBeArchived
-        
+        // 复制约束属性
+        newConstraint.identifier = oldConstraint.identifier
+        newConstraint.priority = oldConstraint.priority
+        newConstraint.shouldBeArchived = oldConstraint.shouldBeArchived
+        NSLayoutConstraint.deactivate([oldConstraint])
         NSLayoutConstraint.activate([newConstraint])
         return newConstraint
     }
     
     /// 显示警告或信息
-    private func showAlertInfoWith(_ info: String, _ style: NSAlert.Style) {
+    func showAlertInfoWith(_ info: String, _ style: NSAlert.Style) {
         let alert = NSAlert()
         alert.messageText = info
         alert.alertStyle = style
@@ -329,24 +400,22 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     /// 配置文本视图
-    private func configJsonTextView(text: String, textView: NSTextView, color: NSColor) {
+    func configJsonTextView(text: String, textView: NSTextView, color: NSColor) {
         let attrString = NSAttributedString(string: text)
         DispatchQueue.main.async {
             textView.textStorage?.setAttributedString(attrString)
             textView.textStorage?.foregroundColor = .clear
         }
     }
-    
-    // MARK: - 缓存相关
-    
+        
     /// 加载用户上次的输入内容
-    private func loadUserLastInputContent() {
+    func loadUserLastInputContent() {
         // URL
         if let lastUrl = UserDefaults.standard.string(forKey: CacheKeys.lastInputURL) {
             urlTF.stringValue = lastUrl
         }
         
-        // 超类名
+        // 父类名或协议名
         if let superClassName = UserDefaults.standard.string(forKey: CacheKeys.superClassName) {
             superClassNameTF.stringValue = superClassName
         }
@@ -373,14 +442,14 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         
         // 代码类型
         let codeTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.buildCodeType)
-        if codeTypeIndex > 0 && codeTypeIndex <= SKCodeType.allCases.count {
+        if codeTypeIndex > 0, codeTypeIndex <= SKCodeType.allCases.count {
             builder.config.codeType = SKCodeType.allCases[codeTypeIndex - 1]
             codeTypeBtn.selectItem(at: codeTypeIndex - 1)
         }
         
         // JSON模型类型
         let jsonTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.supportJSONModelType)
-        if jsonTypeIndex >= 0 && jsonTypeIndex < SKJSONModelType.allCases.count {
+        if jsonTypeIndex >= 0, jsonTypeIndex < SKJSONModelType.allCases.count {
             builder.config.jsonType = SKJSONModelType.allCases[jsonTypeIndex]
             jsonTypeBtn.selectItem(at: jsonTypeIndex)
         }
@@ -393,7 +462,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     }
     
     /// 保存用户输入内容
-    private func saveUserInputContent() {
+    func saveUserInputContent() {
         // 代码类型
         let codeTypeIndex = codeTypeBtn.indexOfSelectedItem
         if codeTypeIndex >= 0 && codeTypeIndex < SKCodeType.allCases.count {
@@ -401,7 +470,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             UserDefaults.standard.set(codeTypeIndex + 1, forKey: CacheKeys.buildCodeType)
         }
         
-        // 父类名
+        // 父类名或协议名
         var superClassName = ""
         if builder.config.codeType == .dart || builder.config.codeType == .typeScript {
             superClassName = superClassNameTF.stringValue
@@ -430,13 +499,13 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         
         // JSON解析框架类型
         let jsonTypeIndex = jsonTypeBtn.indexOfSelectedItem
-        if jsonTypeIndex >= 0 && jsonTypeIndex < SKJSONModelType.allCases.count {
+        if jsonTypeIndex >= 0, jsonTypeIndex < SKJSONModelType.allCases.count {
             builder.config.jsonType = SKJSONModelType.allCases[jsonTypeIndex]
             UserDefaults.standard.set(jsonTypeIndex, forKey: CacheKeys.supportJSONModelType)
         }
         
         // 处理HandyJSON特殊情况
-        if builder.config.superClassName.compare("NSObject") == .orderedSame && builder.config.jsonType == .handyJSON {
+        if builder.config.superClassName.compare("NSObject") == .orderedSame, builder.config.jsonType == .handyJSON {
             builder.config.superClassName = "HandyJSON"
         }
         
@@ -444,40 +513,5 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         UserDefaults.standard.set(generateFileBtn.state == .on, forKey: CacheKeys.shouldGenerateFile)
         UserDefaults.standard.set(generateComment.state == .on, forKey: CacheKeys.shouldGenerateComment)
         builder.config.shouldGenerateComment = (generateComment.state == .on)
-    }
-    
-    // MARK: - NSControlTextEditingDelegate
-    
-    func controlTextDidChange(_ obj: Notification) {
-        if let tf = obj.object as? NSTextField {
-            currentInputTF = tf
-            NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(caculateInputContentWidth), object: nil)
-            self.perform(#selector(caculateInputContentWidth))
-        }
-    }
-    
-    @objc private func caculateInputContentWidth() {
-        guard let tf = currentInputTF else { return }
-        
-        let constraints = tf.constraints
-        let attributes = [NSAttributedString.Key.font: tf.font as Any]
-        let string = NSString(string: tf.stringValue)
-        var strWidth = string.boundingRect(
-            with: NSSizeFromCGSize(CGSize(width: Double(Float.greatestFiniteMagnitude), height: 22.0)),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes
-        ).width + 10
-        
-        strWidth = max(strWidth, 114)
-        
-        for constraint in constraints {
-            if constraint.firstAttribute == .width {
-                constraint.constant = strWidth
-            }
-        }
-    }
-    
-    override var representedObject: Any? {
-        didSet {}
     }
 }

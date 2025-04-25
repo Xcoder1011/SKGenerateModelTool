@@ -36,7 +36,6 @@
 		E04D748E2DB78945000913C0 /* SKCodeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74842DB78945000913C0 /* SKCodeTypes.swift */; };
 		E04D748F2DB78945000913C0 /* SKModelGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74862DB78945000913C0 /* SKModelGenerator.swift */; };
 		E04D74902DB78945000913C0 /* SKFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74852DB78945000913C0 /* SKFileManager.swift */; };
-		E04D74952DB8EE1D000913C0 /* NSRootModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04D74942DB8EE1D000913C0 /* NSRootModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,7 +74,6 @@
 		E04D74862DB78945000913C0 /* SKModelGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKModelGenerator.swift; sourceTree = "<group>"; };
 		E04D74882DB78945000913C0 /* SKModelGeneratorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKModelGeneratorUtils.swift; sourceTree = "<group>"; };
 		E04D74892DB78945000913C0 /* SKStringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKStringExtension.swift; sourceTree = "<group>"; };
-		E04D74942DB8EE1D000913C0 /* NSRootModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSRootModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,7 +163,6 @@
 				BC88CEA22467A8A600A4828B /* ViewController.swift */,
 				BCB6929E24A2EC8F004AC91A /* EncryptionController.swift */,
 				BC874A19250A238C00F3A346 /* SKTextView.swift */,
-				E04D74942DB8EE1D000913C0 /* NSRootModel.swift */,
 				E04D74912DB8DCFF000913C0 /* SKCodeBuilder */,
 				BCB184B224B808AF00C2A5D3 /* SKEncryptString */,
 				A44B9C8F2786922C00BA8991 /* Highlightr */,
@@ -285,7 +282,6 @@
 			files = (
 				BC6E5D5224C0770800809D98 /* EncryptExampleModel.m in Sources */,
 				BC874A1A250A238C00F3A346 /* SKTextView.swift in Sources */,
-				E04D74952DB8EE1D000913C0 /* NSRootModel.swift in Sources */,
 				BCB6929F24A2EC8F004AC91A /* EncryptionController.swift in Sources */,
 				BC88D01E2467C2AA00A4828B /* SKCodeBuilder.swift in Sources */,
 				A44B9D562786953A00BA8991 /* Theme.swift in Sources */,
@@ -445,7 +441,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";
@@ -467,7 +463,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Xcoder1011.SKGenerateModelTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SKGenerateModelTool/SKEncryptString/SKGenerateModelTool-Bridging-Header.h";

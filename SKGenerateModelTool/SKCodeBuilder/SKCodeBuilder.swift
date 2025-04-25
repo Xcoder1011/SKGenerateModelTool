@@ -11,7 +11,7 @@ import Cocoa
 public class SKCodeBuilder {
     var config = SKCodeBuilderConfig()
 
-    // 适配json文件的注释
+    /// 适配json文件的注释
     var commentDicts: [String: String]?
 
     /// 生成代码

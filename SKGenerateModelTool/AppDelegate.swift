@@ -8,19 +8,23 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate,NSWindowDelegate {
+@main
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+    private lazy var statusItem: NSStatusItem = {
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        if let button = item.button {
+            button.image = NSImage(named: "itemIcon")
+            button.action = #selector(applicationShouldHandleReopen(_:hasVisibleWindows:))
+        }
+        return item
+    }()
 
-    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        guard let button = statusItem.button else { return }
-        button.image = NSImage(named: NSImage.Name("itemIcon"))
-        button.action = #selector(applicationShouldHandleReopen(_:hasVisibleWindows:))
-        NSApp.setActivationPolicy(NSApplication.ActivationPolicy.regular)
-        configItemMenu()
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
+        configureStatusItemMenu()
     }
 
+    @objc
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         for window in NSApplication.shared.windows {
             window.makeKeyAndOrderFront(self)
@@ -28,14 +32,33 @@ class AppDelegate: NSObject, NSApplicationDelegate,NSWindowDelegate {
         return true
     }
     
-    func configItemMenu() {
+    private func configureStatusItemMenu() {
         let menu = NSMenu()
+        
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Show", action: #selector(NSApplicationDelegate.applicationShouldHandleReopen(_:hasVisibleWindows:)), keyEquivalent: "w"))
-        menu.addItem(NSMenuItem(title: "Hide", action: #selector(NSApplication.hide(_:)), keyEquivalent: "e"))
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        
+        let showItem = NSMenuItem(
+            title: "显示",
+            action: #selector(applicationShouldHandleReopen(_:hasVisibleWindows:)),
+            keyEquivalent: "w"
+        )
+        
+        let hideItem = NSMenuItem(
+            title: "隐藏",
+            action: #selector(NSApplication.hide(_:)),
+            keyEquivalent: "e"
+        )
+        
+        let quitItem = NSMenuItem(
+            title: "退出",
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        )
+        
+        menu.addItem(showItem)
+        menu.addItem(hideItem)
+        menu.addItem(quitItem)
+        
         statusItem.menu = menu
     }
-
 }
-

@@ -277,7 +277,6 @@ extension SKModelGenerator {
             fromJsonString.append("   return instance;\n")
             toJsonString.append("   return json;\n")
         } else if config.codeType == .typeScript {
-            handleJsonType(hString: hString, mString: mString)
             hString.append("}")
         }
         // 处理嵌套模型
@@ -666,13 +665,13 @@ private extension SKModelGenerator {
         
     /// 生成HandyJSON支持代码
     func generateHandyJSONSupport(hString: NSMutableString, mString: NSMutableString) {
-        hString.append("\n   required init() {}\n")
+        hString.append("\n    required init() {}\n")
         if !handlePropertyMapper.isEmpty {
-            hString.append("\n   public func mapping(mapper: HelpingMapper) {\n")
+            hString.append("\n    public func mapping(mapper: HelpingMapper) {")
             for (key, obj) in handlePropertyMapper {
                 hString.append("\n        mapper <<< self.\(key) <-- \"\(obj)\"")
             }
-            hString.append("\n\n   }\n")
+            hString.append("\n    }\n")
         }
     }
         

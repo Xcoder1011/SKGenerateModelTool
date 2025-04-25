@@ -9,33 +9,38 @@
 import Cocoa
 
 class SKTextView: NSTextView {
-    
-    var placeHolderAttriStr: NSAttributedString?
-    
+    private lazy var placeHolderAttriStr: NSAttributedString = {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: NSColor.placeholderTextColor,
+            .font: NSFont.systemFont(ofSize: 15)
+        ]
+        return NSAttributedString(string: "Input json here...", attributes: attributes)
+    }()
+        
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        let attributes = [NSAttributedString.Key.foregroundColor : NSColor.placeholderTextColor, NSAttributedString.Key.font : NSFont.systemFont(ofSize: 15)]
-        placeHolderAttriStr = NSAttributedString(string: "Input json here...", attributes: attributes)
+        self.font = NSFont.systemFont(ofSize: 15)
     }
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        // Drawing code here.
+        
         if self.string.isEmpty {
-            placeHolderAttriStr?.draw(at: NSPoint(x: 4, y: 0))
+            placeHolderAttriStr.draw(at: NSPoint(x: 4, y: 0))
         }
     }
-    
+        
     override func becomeFirstResponder() -> Bool {
-        self.setNeedsDisplay(self.bounds)
-        self.font = NSFont.systemFont(ofSize: 15)
+        defer {
+            setNeedsDisplay(bounds)
+        }
         return super.becomeFirstResponder()
     }
     
     override func resignFirstResponder() -> Bool {
-        self.setNeedsDisplay(self.bounds)
-        self.font = NSFont.systemFont(ofSize: 15)
+        defer {
+            setNeedsDisplay(bounds)
+        }
         return super.resignFirstResponder()
     }
-   
 }
