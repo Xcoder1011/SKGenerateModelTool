@@ -78,7 +78,11 @@ private extension SKModelGenerator {
     }
    
     /// 处理字典值
-    func handleDictValue(dictValue: Any, key: String, hString: NSMutableString, mString: NSMutableString) {
+    func handleDictValue(dictValue: Any,
+                         key: String,
+                         hString: NSMutableString,
+                         mString: NSMutableString)
+    {
         // 生成类声明
         generateClassDeclaration(dictValue: dictValue, key: key, hString: hString, mString: mString)
         

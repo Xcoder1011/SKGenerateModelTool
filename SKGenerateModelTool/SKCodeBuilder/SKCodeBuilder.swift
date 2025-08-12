@@ -21,7 +21,11 @@ public class SKCodeBuilder {
     }
 
     /// 生成文件
-    func generateFile(with filePath: String?, hString: NSMutableString, mString: NSMutableString, complete: GenerateFileComplete?) {
+    func generateFile(with filePath: String?,
+                      hString: NSMutableString,
+                      mString: NSMutableString,
+                      complete: GenerateFileComplete?)
+    {
         let fileManager = SKFileManager(config: config)
         fileManager.generateFile(with: filePath, hString: hString, mString: mString, complete: complete)
     }

@@ -31,7 +31,11 @@ class SKFileManager {
     // MARK: - Public Method
     
     /// 同步生成文件
-    func generateFile(with filePath: String?, hString: NSMutableString, mString: NSMutableString, complete: GenerateFileComplete?) {
+    func generateFile(with filePath: String?,
+                      hString: NSMutableString,
+                      mString: NSMutableString,
+                      complete: GenerateFileComplete?)
+    {
         do {
             let resultPath = try generateFileSync(with: filePath, hString: hString, mString: mString)
             complete?(true, resultPath)
@@ -42,7 +46,10 @@ class SKFileManager {
     }
     
     /// 异步生成文件
-    func generateFileAsync(with filePath: String?, hString: NSMutableString, mString: NSMutableString) async throws -> String {
+    func generateFileAsync(with filePath: String?,
+                           hString: NSMutableString,
+                           mString: NSMutableString) async throws -> String
+    {
         return try await Task {
             try generateFileSync(with: filePath, hString: hString, mString: mString)
         }.value
@@ -51,7 +58,10 @@ class SKFileManager {
     // MARK: - Private Method
 
     /// 同步生成文件
-    private func generateFileSync(with filePath: String?, hString: NSMutableString, mString: NSMutableString) throws -> String {
+    private func generateFileSync(with filePath: String?,
+                                  hString: NSMutableString,
+                                  mString: NSMutableString) throws -> String
+    {
         guard hString.length > 0, mString.length > 0 else {
             throw SKFileError.emptyContent
         }
@@ -85,7 +95,10 @@ class SKFileManager {
     }
     
     /// 写入文件
-    private func writeFiles(to filePath: String, hString: NSMutableString, mString: NSMutableString) throws {
+    private func writeFiles(to filePath: String,
+                            hString: NSMutableString,
+                            mString: NSMutableString) throws
+    {
         let fileName = (config.codeType == .dart) ? config.rootModelName.underscore_name : config.rootModelName
         
         // 根据代码类型确定文件路径

@@ -111,7 +111,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         updateCodeTheme()
         var urlString = urlTF.stringValue
         guard !urlString.isBlank else { return }
-        
         urlString = urlString.urlEncoding()
         UserDefaults.standard.setValue(urlString, forKey: CacheKeys.lastInputURL)
         
@@ -119,7 +118,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             showAlertInfoWith("无效的URL格式", .warning)
             return
         }
-        
         Task {
             do {
                 let jsonString = try await fetchJsonData(from: url)
@@ -133,24 +131,20 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     /// 使用async/await获取JSON数据
     private func fetchJsonData(from url: URL) async throws -> String {
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-        
         // 处理POST请求
         if reqTypeBtn.indexOfSelectedItem == 1 {
             request = try configurePostRequest(originalUrl: url)
         }
-        
         let (data, _) = try await URLSession.shared.data(for: request)
         let jsonObj = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
         
         guard JSONSerialization.isValidJSONObject(jsonObj) else {
             throw NSError(domain: "JSONError", code: 1, userInfo: [NSLocalizedDescriptionKey: "无效的JSON响应"])
         }
-        
         let formatJsonData = try JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted)
         guard let jsonString = String(data: formatJsonData, encoding: .utf8) else {
             throw NSError(domain: "JSONError", code: 2, userInfo: [NSLocalizedDescriptionKey: "无法将JSON数据转换为字符串"])
         }
-        
         return jsonString
     }
     
@@ -159,49 +153,40 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
         guard let query = originalUrl.query else {
             return URLRequest(url: originalUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
         }
-        
         let urlString = originalUrl.absoluteString
         var urlWithoutQuery = urlString.replacingOccurrences(of: query, with: "")
         if urlWithoutQuery.hasSuffix("?") {
             urlWithoutQuery.removeLast()
         }
-        
         guard let newUrl = URL(string: urlWithoutQuery) else {
             throw NSError(domain: "URLError", code: 3, userInfo: [NSLocalizedDescriptionKey: "无法创建不带查询参数的URL"])
         }
-        
         var request = URLRequest(url: newUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = query.data(using: .utf8)
-        
         return request
     }
     
     /// 开始生成代码
     @IBAction func startMakeCode(_ sender: NSButton) {
         guard let jsonString = jsonTextView.textStorage?.string, !jsonString.isBlank else { return }
-        
         // 处理JSON字符串
         let trimmedStr = jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
         let attriStr = NSMutableString(string: trimmedStr)
-        
         // 处理注释
         var commentDicts: [String: String] = [:]
         parseComments(from: trimmedStr, commentDicts: &commentDicts, attriStr: attriStr)
-        
         do {
             guard let jsonData = attriStr.data(using: String.Encoding.utf8.rawValue) else {
                 showAlertInfoWith("警告: 请输入有效的JSON字符串!", .warning)
                 return
             }
-            
             let jsonObj = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
             guard JSONSerialization.isValidJSONObject(jsonObj) else {
                 showAlertInfoWith("警告: 不是有效的JSON格式!!!", .warning)
                 return
             }
-            
             // 保存用户输入内容并更新主题
             saveUserInputContent()
             updateCodeTheme()
@@ -216,7 +201,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
                     configJsonTextView(text: formattedJsonString, textView: jsonTextView, color: NSColor.blue)
                 }
             }
-            
             Task {
                 await generateModelCode(from: jsonObj)
             }
@@ -256,7 +240,6 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
     
     @objc private func caculateInputContentWidth() {
         guard let tf = currentInputTF else { return }
-        
         let constraints = tf.constraints
         let attributes = [NSAttributedString.Key.font: tf.font as Any]
         let string = NSString(string: tf.stringValue)
@@ -265,9 +248,7 @@ class ViewController: NSViewController, NSControlTextEditingDelegate {
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             attributes: attributes
         ).width + 10
-        
         strWidth = max(strWidth, 114)
-        
         for constraint in constraints {
             if constraint.firstAttribute == .width {
                 constraint.constant = strWidth
@@ -342,7 +323,6 @@ private extension ViewController {
     /// 处理生成的代码
     func handleGeneratedCode(_ hString: NSMutableString, _ mString: NSMutableString) {
         var multiplier: CGFloat = 3/5.0
-        
         switch builder.config.codeType {
         case .objectiveC:
             configJsonTextView(text: mString as String, textView: mTextView, color: codeTextColor)
@@ -351,7 +331,6 @@ private extension ViewController {
         case .dart:
             configJsonTextView(text: mString as String, textView: mTextView, color: codeTextColor)
         }
-        
         hTextViewHeightPriority = modifyConstraint(hTextViewHeightPriority, multiplier)
         configJsonTextView(text: hString as String, textView: hTextView, color: codeTextColor)
         
@@ -414,49 +393,40 @@ private extension ViewController {
         if let lastUrl = UserDefaults.standard.string(forKey: CacheKeys.lastInputURL) {
             urlTF.stringValue = lastUrl
         }
-        
         // 父类名或协议名
         if let superClassName = UserDefaults.standard.string(forKey: CacheKeys.superClassName) {
             superClassNameTF.stringValue = superClassName
         }
-        
         // 模型名前缀
         if let modelNamePrefix = UserDefaults.standard.string(forKey: CacheKeys.modelNamePrefix) {
             modelNamePrefixTF.stringValue = modelNamePrefix
         }
-        
         // 根模型名
         if let rootModelName = UserDefaults.standard.string(forKey: CacheKeys.rootModelName) {
             rootModelNameTF.stringValue = rootModelName
         }
-        
         // 作者名
         if let authorName = UserDefaults.standard.string(forKey: CacheKeys.authorName) {
             authorNameTF.stringValue = authorName
         }
-        
         // 输出文件路径
         if let outFilePath = UserDefaults.standard.string(forKey: CacheKeys.generateFilePath) {
             outputFilePath = outFilePath
         }
-        
         // 代码类型
         let codeTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.buildCodeType)
         if codeTypeIndex > 0, codeTypeIndex <= SKCodeType.allCases.count {
             builder.config.codeType = SKCodeType.allCases[codeTypeIndex - 1]
             codeTypeBtn.selectItem(at: codeTypeIndex - 1)
         }
-        
         // JSON模型类型
         let jsonTypeIndex = UserDefaults.standard.integer(forKey: CacheKeys.supportJSONModelType)
         if jsonTypeIndex >= 0, jsonTypeIndex < SKJSONModelType.allCases.count {
             builder.config.jsonType = SKJSONModelType.allCases[jsonTypeIndex]
             jsonTypeBtn.selectItem(at: jsonTypeIndex)
         }
-        
         // 是否生成文件
         generateFileBtn.state = UserDefaults.standard.bool(forKey: CacheKeys.shouldGenerateFile) ? .on : .off
-        
         // 是否生成注释
         generateComment.state = UserDefaults.standard.bool(forKey: CacheKeys.shouldGenerateComment) ? .on : .off
     }
@@ -469,7 +439,6 @@ private extension ViewController {
             builder.config.codeType = SKCodeType.allCases[codeTypeIndex]
             UserDefaults.standard.set(codeTypeIndex + 1, forKey: CacheKeys.buildCodeType)
         }
-        
         // 父类名或协议名
         var superClassName = ""
         if builder.config.codeType == .dart || builder.config.codeType == .typeScript {

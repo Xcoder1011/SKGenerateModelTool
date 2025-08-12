@@ -34,7 +34,6 @@ class EncryptionController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         configureInitialState()
     }
     
@@ -46,7 +45,6 @@ class EncryptionController: NSViewController {
         }
         saveUserPreferences()
         configJsonTextView(text: inputString, textView: inputTextView, color: inputTextColor)
-        
         // 执行加密
         let key = useKeyBtn.state == .on ? keyTF.stringValue : nil
         encryptAndDisplay(inputString: inputString, key: key)
@@ -54,7 +52,6 @@ class EncryptionController: NSViewController {
     
     @IBAction func copyCodeString(_ sender: NSButton) {
         let stringToCopy: String
-        
         switch sender.tag {
         case CopyButtonTag.header:
             stringToCopy = hTextView.textStorage?.string ?? ""
@@ -63,7 +60,6 @@ class EncryptionController: NSViewController {
         default:
             return
         }
-        
         copyToClipboard(string: stringToCopy)
     }
 }
@@ -73,25 +69,14 @@ class EncryptionController: NSViewController {
 private extension EncryptionController {
     func configureInitialState() {
         useKeyBtn.state = UserDefaults.standard.bool(forKey: UserDefaultsKeys.useKeyBtnState) ? .on : .off
-        
         if let key = UserDefaults.standard.string(forKey: UserDefaultsKeys.cipherContent) {
             keyTF.stringValue = key
         }
-        
-        ///////////////  使用范例 （Usage Example） /////////////////
-        
-//        if let string = sk_OCString(_3596508958) {
-//            print("示例：解密后的数据为：\(string)")
-//        }
-//        if let string = sk_OCString(_4038772756) {
-//            print("The decrypted data is：\(string)")
-//        }
     }
     
     func saveUserPreferences() {
         let useKey = useKeyBtn.state == .on
         UserDefaults.standard.set(useKey, forKey: UserDefaultsKeys.useKeyBtnState)
-        
         if useKey {
             UserDefaults.standard.setValue(keyTF.stringValue, forKey: UserDefaultsKeys.cipherContent)
         }
@@ -102,10 +87,10 @@ private extension EncryptionController {
             guard let self = self else { return }
             
             let headerString = hStr.substring(to: hStr.length)
-            self.configJsonTextView(text: headerString, textView: self.hTextView, color: self.codeTextColor)
+            configJsonTextView(text: headerString, textView: self.hTextView, color: self.codeTextColor)
             
             let implementationString = mStr.substring(to: mStr.length)
-            self.configJsonTextView(text: implementationString, textView: self.mTextView, color: self.codeTextColor)
+            configJsonTextView(text: implementationString, textView: self.mTextView, color: self.codeTextColor)
         }
     }
     
