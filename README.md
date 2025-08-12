@@ -1,27 +1,27 @@
 # SKGenerateModelTool
 
-[![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg)  ![](https://img.shields.io/badge/Dart-flutter-blue)
-    ![](https://img.shields.io/badge/TypeScript-interface-brightgreen)
-    ![](https://img.shields.io/badge/Swift-91.7%25-brightgreen)
-    ![](https://img.shields.io/badge/license-MIT-green)
-
+[![](https://img.shields.io/badge/.dmg-4.2MB-brightgreen)](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg) ![](https://img.shields.io/badge/Dart-flutter-blue)
+![](https://img.shields.io/badge/TypeScript-interface-brightgreen)
+![](https://img.shields.io/badge/Swift-91.7%25-brightgreen)
+![](https://img.shields.io/badge/license-MIT-green)
 
 - 支持`Objective-C` / `Swift` / `Dart` / `TypeScript`
-- 支持通过`URL`链接或`json`字符串一键生成model文件
+- 支持通过`URL`链接或`json`字符串一键生成 model 文件
 - 兼容`YYModel` / `MJExtension` / `HandyJSON`解析
-- 支持字符串加密（可设置不同的密钥，开发者可自行修改加密算法）
-- 支持自定义model父类名、自定义model前缀、自定义作者名、添加注释
+- Swift 模型默认使用`Codable`协议
+- 支持字符串加密及可扩展的自定义加密算法实现
+- 支持自定义模型基类、命名前缀、作者信息及注释
 - 支持代码高亮（使用[highlight.js](https://highlightjs.org/)）
 - 支持导出`TypeScript Interfaces`
 - 支持自定义导出文件路径
 - `Flutter Model`解析兼容了服务端返回`string/int/double`时数据类型混用的情况
-- 兼容服务端返回“id”字段
-- 支持类驼峰命名
-
+- 兼容服务端字段类型混用场景
+- 支持驼峰命名
 
 - Support `Objective-C` / `Swift` / `Dart` / `TypeScript`
 - Supports one-click generation of model files through `URL` links or `json` strings
 - Compatible with `YYModel` / `MJExtension` / `HandyJSON` analysis
+- Swift models use the Codable protocol by default
 - Support string encryption (different keys can be set, developers can modify the encryption algorithm)
 - Support custom model superclass name, custom model prefix, custom author name, add comments
 - Support code highlighting(It uses [highlight.js](https://highlightjs.org/) as it core)
@@ -33,9 +33,8 @@
 
 ### Usage
 
-> * 方式一：直接下载软件安装 [点击下载](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg) 
-> * 方式二：下载代码运行
-
+> - 方式一：直接下载软件安装 [点击下载](https://github.com/Xcoder1011/SKGenerateModelTool/blob/master/SKGenerateModelTool.dmg)
+> - 方式二：下载代码运行
 
 ### Objective-C
 
@@ -57,10 +56,10 @@
 
 ![字符串加密示例](../master/images/encrypt.png)
 
-加密后的内容添加到项目中（声明和定义可以分别放.h和.m），因为代码依赖SKEncryptString结构体，所以需要导入头文件**SKEncryptHeader.h**引用。
+加密后的内容添加到项目中（声明和定义可以分别放.h 和.m），因为代码依赖 SKEncryptString 结构体，所以需要导入头文件**SKEncryptHeader.h**引用。
 
-> 只需把此头文件（SKEncryptHeader.h）加入到项目，并在pch文件中导入该头文件即可使用;
-Just add this header file (SKEncryptHeader.h) to the project and import the header file in the pch file to use;
+> 只需把此头文件（SKEncryptHeader.h）加入到项目，并在 pch 文件中导入该头文件即可使用;
+> Just add this header file (SKEncryptHeader.h) to the project and import the header file in the pch file to use;
 
 ![SKEncryptHeader.h](../master/images/SKEncryptHeader.png)
 
@@ -78,6 +77,7 @@ extern const SKEncryptString * const _3908173925;
 ```
 
 定义：
+
 ```
 /** 需要加密的重要字符，比如AppKey、AppSecret、AppID、数据库密码等 */
 const SKEncryptString * const _3596508958 = &(SKEncryptString){
@@ -118,6 +118,4 @@ const SKEncryptString * const _3908173925 = &(SKEncryptString){
 
 ![encrypt_result](../master/images/encrypt_result.png)
 
-Tip：本工具仅用到简单的XOR加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的dmg文件进行安装使用。
-
-- 简书地址：[https://www.jianshu.com/p/a2ee31a04252](https://www.jianshu.com/p/a2ee31a04252)
+Tip：本工具仅用到简单的 XOR 加密算法，开发者可自行下载项目进行加密算法修改，另外也可直接下载项目里的 dmg 文件进行安装使用。
